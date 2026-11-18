@@ -108,7 +108,7 @@ const T={
  woda:{n:'Woda',u:'ml',c:'#1f8fd0'},posilek:{n:'Posiłek',u:'kcal',c:'#e08a1e'},kawa:{n:'Kawa',u:'ml',c:'#8a5a3b'},
  spac:{n:'Idę spać',u:'',c:'#6b5bd6'},pobudka:{n:'Pobudka',u:'/5',c:'#e2b714'},drzemka:{n:'Drzemka',u:'min',c:'#7d8b96'},
  trening:{n:'Trening',u:'min',c:'#0a7d55'},suple:{n:'Suplementy',u:'',c:'#d0508a'},bol:{n:'Ból',u:'/10',c:'#ff5a3c'},
- alergia:{n:'Alergia',u:'/3',c:'#f07b2c'},energia:{n:'Energia',u:'/5',c:'#c9a400'},waga:{n:'Waga',u:'kg',c:'#55707f'},alkohol:{n:'Alkohol',u:'ml',c:'#8e3b5c'},notatka:{n:'Notatka',u:'',c:'#9aa7b0'}};
+ alergia:{n:'Alergia',u:'/3',c:'#f07b2c'},energia:{n:'Energia',u:'/5',c:'#c9a400'},waga:{n:'Waga',u:'kg',c:'#55707f'},alkohol:{n:'Alkohol',u:'ml',c:'#8e3b5c'},lot:{n:'Lot',u:'',c:'#1d3557'},sluzba:{n:'Służba',u:'',c:'#7a8a99'},notatka:{n:'Notatka',u:'',c:'#9aa7b0'}};
 const CO={trening:['Body by Science','Izometria kolan','Kolana powolne','Kręgosłup','Spacer'],
  suple:['D3','Magnez','Omega-3','Kreatyna','Kolagen + C','Witamina C'],bol:['Kolano lewe','Kolano prawe','Plecy'],
  alergia:['Katar','Oczy','Kichanie','Lek przeciwhistaminowy'],alkohol:['Piwo','Wino','Wódka / mocny','Cydr','Inne'],kawa:['Czarna','Z mlekiem']};
@@ -153,6 +153,49 @@ const HEAD='<circle cx="14" cy="4" r="3.2"/>',DELT='<circle cx="7.6" cy="11" r="
 const BODY={F:[['',HEAD],['delt',DELT],['chest','<ellipse cx="11.6" cy="12.2" rx="2.6" ry="2.2"/><ellipse cx="16.4" cy="12.2" rx="2.6" ry="2.2"/>'],['bic',ARM],['',FORE],['abs','<rect x="11.6" y="15" width="4.8" height="9" rx="1.5"/>'],['obl','<rect x="9.2" y="15.6" width="2" height="7" rx="1"/><rect x="16.8" y="15.6" width="2" height="7" rx="1"/>'],['add','<ellipse cx="14" cy="28.8" rx="1.5" ry="2.6"/>'],['quad',THIGH],['','<ellipse cx="10.8" cy="43.6" rx="1.6" ry="4"/><ellipse cx="17.2" cy="43.6" rx="1.6" ry="4"/>']],
  B:[['',HEAD],['trap','<ellipse cx="14" cy="9.2" rx="4.6" ry="2"/>'],['rdelt',DELT],['upper','<rect x="11" y="11.6" width="6" height="3.8" rx="1"/>'],['lat','<ellipse cx="10.2" cy="16.6" rx="2.3" ry="4"/><ellipse cx="17.8" cy="16.6" rx="2.3" ry="4"/>'],['tri',ARM],['',FORE],['low','<rect x="12" y="20.6" width="4" height="4.2" rx="1"/>'],['gmed','<ellipse cx="9" cy="25" rx="1.4" ry="1.7"/><ellipse cx="19" cy="25" rx="1.4" ry="1.7"/>'],['glute','<ellipse cx="11.3" cy="27.8" rx="2.7" ry="2.5"/><ellipse cx="16.7" cy="27.8" rx="2.7" ry="2.5"/>'],['ham',THIGH.replace(/33\.6/g,'34.6')],['calf','<ellipse cx="10.8" cy="43.6" rx="2" ry="4"/><ellipse cx="17.2" cy="43.6" rx="2" ry="4"/>']]};
 function body(reg,w){w=w||44;const rr=new Set(reg);const g=v=>BODY[v].map(([id,x])=>`<g fill="${id&&rr.has(v+':'+id)?'#e5383b':'var(--mus)'}">${x}</g>`).join('');return `<svg class="mus" viewBox="0 0 60 50" width="${w}" height="${Math.round(w*50/60)}" aria-hidden="true">${g('F')}<g transform="translate(32 0)">${g('B')}</g></svg>`}
+/* ---------- Grafik lotów (PDF z CrewLink / NetLine) ----------
+   Godziny w grafiku są w UTC. Każdy lot zapisujemy z godziną lokalną lotniska wylotu. */
+const AP={WAW:'Europe/Warsaw',KTW:'Europe/Warsaw',WRO:'Europe/Warsaw',KRK:'Europe/Warsaw',GDN:'Europe/Warsaw',POZ:'Europe/Warsaw',RZE:'Europe/Warsaw',SZZ:'Europe/Warsaw',BZG:'Europe/Warsaw',LUZ:'Europe/Warsaw',
+ ORD:'America/Chicago',DFW:'America/Chicago',YYZ:'America/Toronto',YUL:'America/Toronto',EWR:'America/New_York',JFK:'America/New_York',IAD:'America/New_York',BOS:'America/New_York',MIA:'America/New_York',LAX:'America/Los_Angeles',SFO:'America/Los_Angeles',SEA:'America/Los_Angeles',CUN:'America/Cancun',PUJ:'America/Santo_Domingo',
+ NRT:'Asia/Tokyo',HND:'Asia/Tokyo',ICN:'Asia/Seoul',DEL:'Asia/Kolkata',BOM:'Asia/Kolkata',BKK:'Asia/Bangkok',HKT:'Asia/Bangkok',SIN:'Asia/Singapore',HKG:'Asia/Hong_Kong',PEK:'Asia/Shanghai',PKX:'Asia/Shanghai',PVG:'Asia/Shanghai',TAS:'Asia/Tashkent',DXB:'Asia/Dubai',TLV:'Asia/Jerusalem',CMB:'Asia/Colombo',MLE:'Indian/Maldives',ZNZ:'Africa/Dar_es_Salaam',
+ AMS:'Europe/Amsterdam',LHR:'Europe/London',CDG:'Europe/Paris',FRA:'Europe/Berlin',MUC:'Europe/Berlin',BUD:'Europe/Budapest',VIE:'Europe/Vienna',PRG:'Europe/Prague',CPH:'Europe/Copenhagen',ARN:'Europe/Stockholm',ZRH:'Europe/Zurich'};
+const MON={Jan:0,Feb:1,Mar:2,Apr:3,May:4,Jun:5,Jul:6,Aug:7,Sep:8,Oct:9,Nov:10,Dec:11};
+function parseRoster(lines){
+ const per=lines.join(' ').match(/Period:\s*(\d{2})(\w{3})(\d{2})\s*-\s*(\d{2})(\w{3})(\d{2})/);
+ if(!per)throw new Error('Nie rozpoznano okresu grafiku');
+ const y=2000+ +per[3],m=MON[per[2]];
+ const start=Date.UTC(y,m,+per[1]),end=Date.UTC(2000+ +per[6],MON[per[5]],+per[4])+864e5;
+ const t=(d,hm)=>Date.UTC(y,m,d,+hm.slice(0,2),+hm.slice(2,4));
+ const out=[];let day=null,ci=null,mm;
+ for(const raw of lines){
+  const L=raw.replace(/\s+/g,' ').trim();let rest=L;
+  const dm=L.match(/^(\d{2})\.\s*(Mon|Tue|Wed|Thu|Fri|Sat|Sun)\b\s*(.*)$/);
+  if(dm){day=+dm[1];rest=dm[3]}
+  if(day==null)continue;
+  if((mm=rest.match(/C\/I\s+([A-Z]{3})\s+(\d{4})/)))ci=t(day,mm[2]);
+  if((mm=rest.match(/(DH\/)?LO\s*(\d{1,4})\s+(?:R\s+)?([A-Z]{3})\s+(\d{4})\s+(\d{4})\s+([A-Z]{3})(?:\s+(\d{3}))?/))){
+   const dep=t(day,mm[4]);let arr=t(day,mm[5]);if(arr<=dep)arr+=864e5;
+   out.push({k:'lot',fn:'LO'+mm[2],dh:!!mm[1],from:mm[3],to:mm[6],dep,arr,ac:mm[7]||'',ci:(ci&&dep>=ci&&dep-ci<6*36e5)?ci:null});ci=null}
+  else if((mm=rest.match(/\b(STBTEL|STBY\w*|RES\w*|ASEC|E-LEARN|B78[A-Z]{3}|SIM\w*|CRM\w*|MED\w*)\s+(?:([A-Z]{3})\s+)?(\d{4})\s+(\d{4})/))){
+   const s=t(day,mm[3]);let e=t(day,mm[4]);if(e<=s)e+=864e5;out.push({k:'sluzba',code:mm[1],st:mm[2]||'',dep:s,arr:e})}
+ }
+ return{start,end,items:out}}
+
+function loadPdfJs(){if(window.pdfjsLib)return Promise.resolve();return new Promise((ok,no)=>{const sc=document.createElement('script');sc.src='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js';sc.onload=()=>{pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';ok()};sc.onerror=()=>no(new Error('Brak internetu – grafik wgrasz po połączeniu'));document.head.appendChild(sc)})}
+async function pdfLines(file){await loadPdfJs();const pdf=await pdfjsLib.getDocument({data:await file.arrayBuffer()}).promise;const lines=[];
+ for(let p=1;p<=pdf.numPages;p++){const tc=await (await pdf.getPage(p)).getTextContent();const rows=[];
+  tc.items.forEach(it=>{if(!it.str.trim())return;const y=it.transform[5];let row=rows.find(r=>Math.abs(r.y-y)<=2.5);if(!row){row={y,it:[]};rows.push(row)}row.it.push([it.transform[4],it.str])});
+  rows.sort((a,b)=>b.y-a.y).forEach(r=>lines.push(r.it.sort((a,b)=>a[0]-b[0]).map(x=>x[1]).join(' ')))}
+ return lines}
+function rosterEntries(r){return r.items.map(it=>{const d=new Date(it.dep),st=it.k==='lot'?it.from:it.st,tz=AP[st]||(st?'UTC':S.home);
+ return{id:(it.k==='lot'?'lot-':'sl-')+d.toISOString().slice(0,16)+'-'+(it.fn||it.code),utc:d.toISOString(),tz,offset_min:offMin(d,tz),local:localStr(d,tz),typ:it.k,ilosc:null,co:[],
+  opis:it.k==='lot'?`${it.fn} ${it.from}→${it.to}${it.dh?' (przelot służbowy)':''}`:it.code+(it.st?' '+it.st:''),fn:it.fn||'',from:st||'',to:it.to||'',arr_utc:new Date(it.arr).toISOString(),ci_utc:it.ci?new Date(it.ci).toISOString():'',ac:it.ac||'',dh:!!it.dh,code:it.code||''}})}
+async function importRoster(file){const r=parseRoster(await pdfLines(file));const N=rosterEntries(r),ids=new Set(N.map(e=>e.id));
+ const old=Object.values(E).filter(e=>(e.typ==='lot'||e.typ==='sluzba')&&!ids.has(e.id)&&new Date(e.utc)>=r.start&&new Date(e.utc)<r.end);
+ old.forEach(e=>{delete E[e.id];Q.push({op:'delete',id:e.id,qid:Date.now()+'-'+Math.random().toString(36).slice(2,7)})});
+ N.forEach(e=>{E[e.id]=e;Q.push({op:'upsert',entry:e,qid:Date.now()+'-'+Math.random().toString(36).slice(2,7)})});persist();sync();
+ return `${N.filter(e=>e.typ==='lot').length} lotów i ${N.filter(e=>e.typ==='sluzba').length} innych służb (${new Date(r.start).toLocaleDateString('pl-PL',{month:'long',year:'numeric',timeZone:'UTC'})})`}
+const hm=(iso,tz)=>localStr(new Date(iso),tz).slice(11);
 const ls={get(k,d){try{const v=localStorage.getItem('dz_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('dz_'+k,JSON.stringify(v))}catch(e){}}};
 let TH=ls.get('thumbs',{}),E=ls.get('entries',{}),Q=ls.get('queue',[]),R=ls.get('recs',[]),S=Object.assign({url:'',key:'',home:'Europe/Warsaw',cel:3000,vitc:1000},ls.get('settings',{}));
 const $=s=>document.querySelector(s);
@@ -243,16 +286,20 @@ function vHistoria(){const L=list().filter(e=>!filt||e.typ===filt);const days=[.
  return `<div class="chips" style="margin-bottom:6px"><button class="chip ${!filt?'on':''}" data-f="">Wszystko</button>${types.map(k=>`<button class="chip ${filt===k?'on':''}" data-f="${k}">${T[k].n}</button>`).join('')}</div>
  ${days.length?days.map(d=>{const w=sumDay('woda',d),sl=sleepFor(d);return `<div class="day"><b>${dayName(d)}</b><span>${w?'woda '+(w/1000).toFixed(1).replace('.',',')+' l':''}${sl?' · sen '+sl.toFixed(1).replace('.',',')+' h':''}</span></div>`+
   L.filter(e=>dayOf(e)===d).map(e=>{const away=e.tz!==S.home;const homeT=away?localStr(new Date(e.utc),S.home).slice(11):'';
+   if(e.typ==='lot'||e.typ==='sluzba'){const tz2=e.typ==='lot'?(AP[e.to]||'UTC'):e.tz;return `<div class="ent" style="--c:${T[e.typ].c}"><i></i><span class="m"><b>${esc(e.typ==='lot'?e.fn+' '+e.from+' → '+e.to:e.code)}</b>${e.dh?' <small style="display:inline">przelot</small>':''}<small>${e.ci_utc?'odprawa '+hm(e.ci_utc,e.tz)+' · ':''}${e.typ==='lot'?'przylot '+hm(e.arr_utc,tz2)+' '+esc(short(tz2)):'do '+hm(e.arr_utc,e.tz)}</small></span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${e.tz!==S.home?`<small>dom ${localStr(new Date(e.utc),S.home).slice(11)}</small>`:''}</span></div>`}
    return `<button class="ent" style="--c:${T[e.typ].c}" data-edit="${e.id}"><i></i><span class="m"><b>${T[e.typ].n}</b> ${esc(val(e))}${pending(e.id)?'<span class="pend" title="Czeka na wysłanie"></span>':''}${(e.co&&e.co.length)||e.opis?`<small>${esc([...(e.co||[]).filter(c=>!(e.typ==='woda'&&c==='Witamina C')),e.opis].filter(Boolean).join(' · '))}</small>`:''}${e.sets&&e.sets.length?`<small>${esc(e.sets.map(x=>(MUS[x.ex]?MUS[x.ex][0].split(' (')[0]:x.ex)+' '+(x.kg??'–')+' kg × '+(x.reps??'–')+', '+(x.tul??'–')+' s').join(' · '))}</small>`:''}${TH[e.id]?`<img src="${TH[e.id]}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-top:6px;display:block">`:e.foto?'<small>ze zdjęciem</small>':''}</span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${away?`<small>dom ${homeT}</small>`:''}</span></button>`}).join('')}).join('')
  :'<section class="card"><p style="margin:0">Brak wpisów. Dodaj pierwszy na ekranie Dodaj.</p></section>'}`}
 
 /* ---------- Ekran: Zalecenia ---------- */
+function vGrafik(){const now=new Date().toISOString();const U=Object.values(E).filter(e=>(e.typ==='lot'||e.typ==='sluzba')&&(e.arr_utc||e.utc)>=now).sort((a,b)=>a.utc.localeCompare(b.utc)).slice(0,8);
+ return `<section class="card"><h2>Najbliższe służby</h2>${U.length?U.map(e=>`<p style="margin:6px 0"><b>${dayName(e.local.slice(0,10))} ${e.local.slice(11)} ${esc(short(e.tz))}</b> · ${esc(e.typ==='lot'?e.fn+' '+e.from+' → '+e.to:e.code)}${e.typ==='lot'?` <span class="hint">(przylot ${hm(e.arr_utc,AP[e.to]||'UTC')} ${esc(short(AP[e.to]||'UTC'))})</span>`:''}</p>`).join(''):'<p class="hint" style="margin:0">Brak grafiku. Wgraj PDF z CrewLink w Ustawieniach.</p>'}</section>`}
 function vZal(){const d=todayLocal();const dz=R.filter(r=>r.data===d),og=R.filter(r=>!r.data||r.data==='ogólne'),nx=R.filter(r=>r.data>d).sort((a,b)=>a.data.localeCompare(b.data)).slice(0,10);
  const grp=[...new Set(EX.map(x=>x[0]))];
  return `${dz.length?dz.map(r=>`<section class="card rec"><h2>Dziś: ${esc(r.tytul)}</h2><p style="margin:0">${esc(r.tekst)}</p></section>`).join(''):''}
  ${og.map(r=>`<section class="card"><h2>${esc(r.tytul)}</h2><p style="margin:0">${esc(r.tekst)}</p></section>`).join('')}
  ${nx.length?`<section class="card"><h2>Kolejne dni</h2>${nx.map(r=>`<p style="margin:6px 0"><b>${dayName(r.data)}:</b> ${esc(r.tekst)}</p>`).join('')}</section>`:''}
  ${!R.length?'<section class="card"><p style="margin:0">Zalecenia pojawią się po pierwszej synchronizacji z arkuszem.</p></section>':''}
+ ${vGrafik()}
  <section class="card"><h2>Ćwiczenia</h2>${grp.map(g=>`<p class="hint" style="margin:12px 0 0"><b>${g}</b></p>${EX.filter(x=>x[0]===g).map(x=>`<details><summary>${x[1]}</summary><p style="margin:6px 0">${x[2]}</p><a href="${x[3]}" target="_blank" rel="noopener">Film (wymaga internetu)</a></details>`).join('')}`).join('')}</section>`}
 
 /* ---------- Ekran: Postęp ---------- */
@@ -278,6 +325,7 @@ function vPostep(){const ds=[...Array(14)].map((_,i)=>{const d=new Date(Date.now
 /* ---------- Ekran: Ustawienia ---------- */
 function vUst(){return `<section class="card"><h2>Połączenie z arkuszem</h2><label for="s_url">Adres skryptu (Apps Script)</label><input id="s_url" type="url" value="${esc(S.url)}" placeholder="https://script.google.com/macros/s/…/exec"><label for="s_key">Tajny klucz</label><input id="s_key" type="text" value="${esc(S.key)}" autocomplete="off"><div class="row" style="margin-top:12px"><button class="pri" data-ss="1">Zapisz i synchronizuj</button></div></section>
  <section class="card"><h2>Strefa domowa i cele</h2><label for="s_home">Strefa domowa</label><input id="s_home" type="text" value="${esc(S.home)}"><p class="hint">Telefon jest teraz w strefie ${esc(devTz())} (${esc(short(devTz()))}). Każdy wpis zapisuje swoją strefę, więc godziny z postojów się nie mieszają.</p><label for="s_cel">Cel wody (ml)</label><input id="s_cel" type="number" value="${esc(S.cel)}"><label for="s_vc">Witamina C w wodzie, domyślna dawka (mg)</label><input id="s_vc" type="number" value="${esc(S.vitc)}"><p class="hint">Mieszanka askorbinianu sodu z kwasem askorbinowym. Przycisk „+500 z wit. C” zapisuje tę dawkę.</p></section>
+ <section class="card"><h2>Grafik lotów</h2><p class="hint" style="margin:0 0 10px">Wgraj PDF „Individual plan” z CrewLink. Godziny z grafiku (UTC) zamienię na lokalne. Ponowne wgranie tego samego miesiąca (np. v2) zastępuje poprzednią wersję.</p><input id="s_pdf" type="file" accept="application/pdf,.pdf" style="display:none"><button class="pri" data-pdf="1">Wgraj grafik (PDF)</button><p class="hint" id="pdfmsg"></p></section>
  <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
 
 /* ---------- Render i zdarzenia ---------- */
@@ -294,8 +342,9 @@ $('#view').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
  else if(d.edit)openSheet(null,E[d.edit]);
  else if(d.f!==undefined){filt=d.f;render()}
  else if(d.pex){pex=d.pex;render()}
+ else if(d.pdf){$('#s_pdf').click()}
  else if(d.ss){S.url=$('#s_url').value.trim();S.key=$('#s_key').value.trim();S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S);toast('Zapisano ustawienia');sync()}});
-$('#view').addEventListener('change',e=>{if(['s_home','s_cel','s_vc'].includes(e.target.id)){S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S)}});
+$('#view').addEventListener('change',async e=>{if(e.target.id==='s_pdf'&&e.target.files[0]){const msg=$('#pdfmsg');msg.textContent='Czytam grafik…';try{const t=await importRoster(e.target.files[0]);msg.textContent='Wgrano: '+t;toast('Grafik wgrany')}catch(x){msg.textContent='Nie udało się: '+(x.message||x)}e.target.value='';return}if(['s_home','s_cel','s_vc'].includes(e.target.id)){S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S)}});
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.close)closeSheet();else if(d.save)saveSheet();
  else if(d.del){const x=E[cur.id];delete E[cur.id];push({op:'delete',id:x.id});closeSheet();toast('Usunięto');render()}
