@@ -183,7 +183,7 @@ function openSheet(typ,entry){const e=entry||{typ,ilosc:null,co:[],opis:''};cur=
  else if(t.u&&cur.typ!=='spac')f+=`<label for="f_il">Ilość (${t.u})${cur.typ==='posilek'?', opcjonalnie':''}</label><input id="f_il" type="number" inputmode="decimal" step="any" value="${esc(cur.ilosc)}">`;
  if(cur.typ==='woda')f+=`<div class="chips" style="margin-top:8px">${[150,250,330,500,750].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div><div class="row" style="margin-top:12px"><button class="chip ${cur.vitc?'on':''}" data-vc="1">Z witaminą C</button><input id="f_vc" type="number" inputmode="numeric" style="width:110px" value="${esc(cur.vitc||S.vitc)}"><span class="hint" style="margin:0">mg</span></div>`;
  if(cur.typ==='alkohol')f+=`<div class="chips" style="margin-top:8px">${[40,100,150,330,500].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div>`;
- if(cur.typ==='posilek')f+=`<label>Zdjęcie</label>${(cur.id&&TH[cur.id])?`<img src="${TH[cur.id]}" alt="" style="width:120px;border-radius:12px;display:block;margin-bottom:8px">`:''}<img id="f_prev" alt="" style="width:120px;border-radius:12px;display:none;margin-bottom:8px"><input id="f_ph" type="file" accept="image/*" capture="environment" style="display:none"><button data-ph="1">${cur.id?'Zmień zdjęcie':'Zrób zdjęcie'}</button>`;
+ if(cur.typ==='posilek')f+=`<label>Zdjęcie</label>${(cur.id&&TH[cur.id])?`<img src="${TH[cur.id]}" alt="" style="width:120px;border-radius:12px;display:block;margin-bottom:8px">`:''}<img id="f_prev" alt="" style="width:120px;border-radius:12px;display:none;margin-bottom:8px"><input id="f_ph" type="file" accept="image/*" capture="environment" style="display:none"><input id="f_ph2" type="file" accept="image/*" style="display:none"><div class="row"><button data-ph="f_ph">${cur.id?'Nowe zdjęcie':'Zrób zdjęcie'}</button><button data-ph="f_ph2">Z galerii</button></div>`;
  if(CO[cur.typ])f+=`<label>${cur.typ==='trening'?'Rodzaj':cur.typ==='bol'?'Gdzie boli':cur.typ==='suple'?'Co wziąłeś':cur.typ==='alkohol'?'Rodzaj':'Objawy'}</label><div class="chips">${CO[cur.typ].map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
  f+=`<label for="f_op">${cur.typ==='posilek'?'Co zjadłeś':'Notatka'}${cur.typ==='notatka'||cur.typ==='posilek'?'':' (opcjonalnie)'}</label><textarea id="f_op">${esc(cur.opis)}</textarea>`;
  f+=`<label for="f_when">Godzina (${esc(short(cur.tz))}${cur.tz!==devTz()?' – strefa z chwili wpisu':''})</label><input id="f_when" type="datetime-local" value="${whenVal}">`;
@@ -249,9 +249,9 @@ $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();
  else if(d.sc){cur.ilosc=+d.sc;b.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b))}
  else if(d.q){$('#f_il').value=d.q}
  else if(d.vc){cur.vitc=cur.vitc?null:(+$('#f_vc').value||S.vitc);b.classList.toggle('on')}
- else if(d.ph){$('#f_ph').click()}
+ else if(d.ph){$('#'+d.ph).click()}
  else if(d.co){const i=cur.co.indexOf(d.co);i<0?cur.co.push(d.co):cur.co.splice(i,1);b.classList.toggle('on')}});
-$('#sheet').addEventListener('change',async e=>{if(e.target.id!=='f_ph'||!e.target.files[0])return;try{const f=e.target.files[0];cur.photo=await shrink(f,1024,.72);cur.thumb=await shrink(f,240,.6);const p=$('#f_prev');p.src=cur.thumb;p.style.display='block'}catch(x){toast('Nie udało się wczytać zdjęcia')}});
+$('#sheet').addEventListener('change',async e=>{if(!['f_ph','f_ph2'].includes(e.target.id)||!e.target.files[0])return;try{const f=e.target.files[0];cur.photo=await shrink(f,1024,.72);cur.thumb=await shrink(f,240,.6);const p=$('#f_prev');p.src=cur.thumb;p.style.display='block'}catch(x){toast('Nie udało się wczytać zdjęcia')}});
 $('#sheet').addEventListener('input',e=>{if(e.target.id==='f_il'&&e.target.type==='range')$('#f_v').textContent=e.target.value});
 addEventListener('online',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();sync()}});
 setInterval(clock,30000);setInterval(()=>{if(Q.length)sync()},60000);
