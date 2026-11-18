@@ -13,7 +13,7 @@
    PICTURE: duży pierścień wody na ekranie Dodaj
    COLOUR and TYPE: błękit wody, biel, koralowy akcent; systemowy krój, grube cyfry
    LAYOUT: jedna kolumna, dolny pasek nawigacji, arkusz wpisu wysuwany od dołu */
-:root{color-scheme:light dark;--bg:light-dark(#fff,#06161f);--card:light-dark(#eef5f9,#0d2531);--ink:light-dark(#0b2230,#e3f0f6);--mute:light-dark(#4f6775,#93abb8);--sea:light-dark(#0a6aa1,#3fb0e8);--sea2:light-dark(#cfe6f2,#123a4d);--acc:#ff5a3c;--ok:light-dark(#0a7d55,#43c995);--line:light-dark(#d6e3ea,#1c3a49)}
+:root{color-scheme:light dark;--mus:light-dark(#c9d6de,#2b4a5a);--bg:light-dark(#fff,#06161f);--card:light-dark(#eef5f9,#0d2531);--ink:light-dark(#0b2230,#e3f0f6);--mute:light-dark(#4f6775,#93abb8);--sea:light-dark(#0a6aa1,#3fb0e8);--sea2:light-dark(#cfe6f2,#123a4d);--acc:#ff5a3c;--ok:light-dark(#0a7d55,#43c995);--line:light-dark(#d6e3ea,#1c3a49)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
@@ -71,6 +71,15 @@ nav a.on{color:var(--sea)}nav a.on i{opacity:1}
 .bars .v{text-align:right;font-variant-numeric:tabular-nums}
 .rec{background:#0a6aa1;color:#fff}.rec .hint{color:#ffffffcc}
 details{border-top:1px solid var(--line);padding:10px 0}details summary{font-weight:600;cursor:pointer;min-height:32px}
+.mus{flex:none;display:block}
+.set{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;background:var(--card);border-radius:14px;padding:10px;margin:8px 0}
+.set small{display:block;color:var(--mute);font-size:12px;margin:4px 0}
+.set .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:6px}
+.set .g3 input{min-height:40px;padding:0 8px}
+.set .row button{min-height:36px;font-size:14px}
+.ptiles{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:8px}
+.ptiles button{display:flex;align-items:center;gap:8px;text-align:left;min-height:56px;padding:6px 10px;font-size:14px;line-height:1.2}
+.mini{margin:10px 0 4px}.mini svg{display:block}
 .st{font-size:13px;color:var(--mute);text-align:center;margin:10px 0}
 a{color:var(--sea)}
 @media(max-width:420px){.water{grid-template-columns:1fr}.wbtn{grid-template-columns:repeat(3,minmax(0,1fr))}}
@@ -96,13 +105,14 @@ a{color:var(--sea)}
 {
 /* ---------- Dane i typy ---------- */
 const T={
- woda:{n:'Woda',u:'ml',c:'#1f8fd0'},posilek:{n:'Posiłek',u:'kcal',c:'#e08a1e'},kawa:{n:'Kawa',u:'szt.',c:'#8a5a3b'},
+ woda:{n:'Woda',u:'ml',c:'#1f8fd0'},posilek:{n:'Posiłek',u:'kcal',c:'#e08a1e'},kawa:{n:'Kawa',u:'ml',c:'#8a5a3b'},
  spac:{n:'Idę spać',u:'',c:'#6b5bd6'},pobudka:{n:'Pobudka',u:'/5',c:'#e2b714'},drzemka:{n:'Drzemka',u:'min',c:'#7d8b96'},
  trening:{n:'Trening',u:'min',c:'#0a7d55'},suple:{n:'Suplementy',u:'',c:'#d0508a'},bol:{n:'Ból',u:'/10',c:'#ff5a3c'},
  alergia:{n:'Alergia',u:'/3',c:'#f07b2c'},energia:{n:'Energia',u:'/5',c:'#c9a400'},waga:{n:'Waga',u:'kg',c:'#55707f'},alkohol:{n:'Alkohol',u:'ml',c:'#8e3b5c'},notatka:{n:'Notatka',u:'',c:'#9aa7b0'}};
 const CO={trening:['Body by Science','Izometria kolan','Kolana powolne','Kręgosłup','Spacer'],
  suple:['D3','Magnez','Omega-3','Kreatyna','Kolagen + C','Witamina C'],bol:['Kolano lewe','Kolano prawe','Plecy'],
- alergia:['Katar','Oczy','Kichanie','Lek przeciwhistaminowy'],alkohol:['Piwo','Wino','Wódka / mocny','Cydr','Inne']};
+ alergia:['Katar','Oczy','Kichanie','Lek przeciwhistaminowy'],alkohol:['Piwo','Wino','Wódka / mocny','Cydr','Inne'],kawa:['Czarna','Z mlekiem']};
+const SINGLE={kawa:1};
 const SCALE={pobudka:[1,5],energia:[1,5],alergia:[1,3]};
 const EX=[
  ['Body by Science','Wyciąg górny','Uda zablokowane, ściągasz drążek do klatki przez 4–5 s, oddajesz przez 4–5 s. Bez szarpania tułowiem. Do upadku, 60–120 s.','https://www.youtube.com/watch?v=3JL9PoZy5G0'],
@@ -117,6 +127,32 @@ const EX=[
  ['Kręgosłup','Deska bokiem','Łokieć pod barkiem, biodra w linii. 10 s, stopniowo do 30 s, 3 serie na stronę.','https://www.youtube.com/watch?v=FmZwkgg7pqU&t=203s'],
  ['Kręgosłup','Pies z ptakiem','Klęk podparty, prostujesz rękę i przeciwną nogę, 8 s, miednica nieruchoma.','https://www.youtube.com/watch?v=FmZwkgg7pqU&t=322s'],
  ['Kręgosłup','Pallof press','Taśma z boku na wysokości pępka, wypychasz ręce przed siebie i nie dajesz się obrócić. 8–10 na stronę.','https://www.youtube.com/watch?v=lqPrSGXfL1Q']];
+const MUS={
+ pulldown:['Ściąganie drążka (wyciąg górny)','Plecy',['B:lat','F:bic']],
+ row:['Wiosłowanie siedząc','Plecy',['B:upper','B:lat','B:rdelt']],
+ pullup:['Podciąganie z asystą','Plecy',['B:lat','F:bic']],
+ shrug:['Szrugsy (unoszenie barków)','Plecy',['B:trap']],
+ chest:['Wyciskanie siedząc (maszyna)','Klatka',['F:chest','F:delt','B:tri']],
+ fly:['Rozpiętki na maszynie','Klatka',['F:chest']],
+ dips:['Pompki na poręczach z asystą','Klatka',['F:chest','B:tri']],
+ ohp:['Wyciskanie nad głowę (maszyna)','Barki',['F:delt','B:tri']],
+ lateral:['Unoszenie ramion bokiem','Barki',['F:delt']],
+ reverse:['Odwrotne rozpiętki (tył barków)','Barki',['B:rdelt','B:upper']],
+ curl:['Uginanie ramion (biceps)','Ramiona',['F:bic']],
+ triext:['Prostowanie ramion (triceps)','Ramiona',['B:tri']],
+ legpress:['Leg press','Nogi',['F:quad','B:glute']],
+ legext:['Prostowanie nóg (czworogłowe)','Nogi',['F:quad']],
+ legcurl:['Uginanie nóg (dwugłowe)','Nogi',['B:ham']],
+ hip:['Unoszenie bioder (pośladki)','Nogi',['B:glute','B:ham']],
+ abd:['Odwodzenie nóg (pośladek średni)','Nogi',['B:gmed']],
+ add:['Przywodzenie nóg','Nogi',['F:add']],
+ calf:['Wspięcia na palce (łydki)','Nogi',['B:calf']],
+ pallof:['Pallof press (skośne brzucha)','Tułów',['F:obl']],
+ curlup:['Spięcie McGilla (prosty brzucha)','Tułów',['F:abs']]};
+const HEAD='<circle cx="14" cy="4" r="3.2"/>',DELT='<circle cx="7.6" cy="11" r="2.5"/><circle cx="20.4" cy="11" r="2.5"/>',ARM='<ellipse cx="6.2" cy="16.6" rx="1.6" ry="3.2"/><ellipse cx="21.8" cy="16.6" rx="1.6" ry="3.2"/>',FORE='<ellipse cx="5.4" cy="23.2" rx="1.3" ry="3"/><ellipse cx="22.6" cy="23.2" rx="1.3" ry="3"/>',THIGH='<ellipse cx="10.8" cy="33.6" rx="2.4" ry="5.6"/><ellipse cx="17.2" cy="33.6" rx="2.4" ry="5.6"/>';
+const BODY={F:[['',HEAD],['delt',DELT],['chest','<ellipse cx="11.6" cy="12.2" rx="2.6" ry="2.2"/><ellipse cx="16.4" cy="12.2" rx="2.6" ry="2.2"/>'],['bic',ARM],['',FORE],['abs','<rect x="11.6" y="15" width="4.8" height="9" rx="1.5"/>'],['obl','<rect x="9.2" y="15.6" width="2" height="7" rx="1"/><rect x="16.8" y="15.6" width="2" height="7" rx="1"/>'],['add','<ellipse cx="14" cy="28.8" rx="1.5" ry="2.6"/>'],['quad',THIGH],['','<ellipse cx="10.8" cy="43.6" rx="1.6" ry="4"/><ellipse cx="17.2" cy="43.6" rx="1.6" ry="4"/>']],
+ B:[['',HEAD],['trap','<ellipse cx="14" cy="9.2" rx="4.6" ry="2"/>'],['rdelt',DELT],['upper','<rect x="11" y="11.6" width="6" height="3.8" rx="1"/>'],['lat','<ellipse cx="10.2" cy="16.6" rx="2.3" ry="4"/><ellipse cx="17.8" cy="16.6" rx="2.3" ry="4"/>'],['tri',ARM],['',FORE],['low','<rect x="12" y="20.6" width="4" height="4.2" rx="1"/>'],['gmed','<ellipse cx="9" cy="25" rx="1.4" ry="1.7"/><ellipse cx="19" cy="25" rx="1.4" ry="1.7"/>'],['glute','<ellipse cx="11.3" cy="27.8" rx="2.7" ry="2.5"/><ellipse cx="16.7" cy="27.8" rx="2.7" ry="2.5"/>'],['ham',THIGH.replace(/33\.6/g,'34.6')],['calf','<ellipse cx="10.8" cy="43.6" rx="2" ry="4"/><ellipse cx="17.2" cy="43.6" rx="2" ry="4"/>']]};
+function body(reg,w){w=w||44;const rr=new Set(reg);const g=v=>BODY[v].map(([id,x])=>`<g fill="${id&&rr.has(v+':'+id)?'#e5383b':'var(--mus)'}">${x}</g>`).join('');return `<svg class="mus" viewBox="0 0 60 50" width="${w}" height="${Math.round(w*50/60)}" aria-hidden="true">${g('F')}<g transform="translate(32 0)">${g('B')}</g></svg>`}
 const ls={get(k,d){try{const v=localStorage.getItem('dz_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('dz_'+k,JSON.stringify(v))}catch(e){}}};
 let TH=ls.get('thumbs',{}),E=ls.get('entries',{}),Q=ls.get('queue',[]),R=ls.get('recs',[]),S=Object.assign({url:'',key:'',home:'Europe/Warsaw',cel:3000,vitc:1000},ls.get('settings',{}));
 const $=s=>document.querySelector(s);
@@ -133,7 +169,7 @@ function fromLocal(str,tz){const [a,b]=str.split('T');const [y,m,dd]=a.split('-'
 const short=tz=>{try{return new Intl.DateTimeFormat('pl-PL',{timeZone:tz,timeZoneName:'short'}).formatToParts(new Date()).find(p=>p.type==='timeZoneName').value}catch(e){return tz}};
 const dayName=s=>new Date(s+'T12:00Z').toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'});
 const todayLocal=()=>localStr(new Date(),devTz()).slice(0,10);
-function mk(typ,f){const tz=devTz(),d=f.when?fromLocal(f.when,tz):new Date();return{id:(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)),utc:d.toISOString(),tz,offset_min:offMin(d,tz),local:localStr(d,tz),typ,ilosc:f.ilosc??null,co:f.co||[],opis:f.opis||'',vitc_mg:f.vitc_mg||null,foto:''}}
+function mk(typ,f){const tz=devTz(),d=f.when?fromLocal(f.when,tz):new Date();return{id:(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)),utc:d.toISOString(),tz,offset_min:offMin(d,tz),local:localStr(d,tz),typ,ilosc:f.ilosc??null,co:f.co||[],opis:f.opis||'',vitc_mg:f.vitc_mg||null,foto:'',sets:f.sets||[]}}
 
 /* ---------- Zapis, kolejka, synchronizacja ---------- */
 function persist(){ls.set('entries',E);ls.set('queue',Q)}
@@ -171,28 +207,34 @@ function vDodaj(){const day=todayLocal(),w=sumDay('woda',day),cel=S.cel||3000,p=
  return `<section class="card"><h2>Woda dziś</h2><div class="water"><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--sea2)" stroke-width="12"/><circle class="v" cx="60" cy="60" r="52" fill="none" stroke="${p>=1?'var(--ok)':'var(--sea)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}"/></svg><div><b>${(w/1000).toFixed(2).replace('.',',')}</b><span>z ${(cel/1000).toFixed(1).replace('.',',')} l</span></div></div>
  <div class="wbtn"><button class="pri" data-w="250">+250 ml</button><button class="pri" data-w="500">+500 ml</button><button class="pri" data-w="500" data-c="1">+500 z wit. C</button><button data-open="woda">Inna ilość</button>${lastW?`<button data-undo="${lastW.id}">Cofnij ${esc(lastW.ilosc)} ml</button>`:''}</div></div>
  <p class="hint">W locie 200–250 ml co godzinę służby. Kawa i herbata się nie liczą.</p></section>
- <section><div class="tiles">${tiles.map(k=>`<button class="tile" style="--c:${T[k].c}" data-open="${k}"><i></i>${T[k].n}${k==='kawa'?`<small>dziś ${sumDay('kawa',day)}</small>`:''}</button>`).join('')}</div></section>`}
+ <section><div class="tiles">${tiles.map(k=>`<button class="tile" style="--c:${T[k].c}" data-open="${k}"><i></i>${T[k].n}${k==='kawa'?`<small>dziś ${list().filter(e=>e.typ==='kawa'&&dayOf(e)===day).length}</small>`:''}</button>`).join('')}</div></section>`}
 
 /* ---------- Arkusz wpisu (nowy lub edycja) ---------- */
 let cur=null;
-function openSheet(typ,entry){const e=entry||{typ,ilosc:null,co:[],opis:''};cur={typ:e.typ,id:entry?entry.id:null,ilosc:e.ilosc,co:[...(e.co||[])],opis:e.opis||'',tz:entry?entry.tz:devTz(),vitc:e.vitc_mg||null,photo:null,thumb:null};
+function openSheet(typ,entry){const e=entry||{typ,ilosc:null,co:[],opis:''};cur={typ:e.typ,id:entry?entry.id:null,ilosc:e.ilosc,co:[...(e.co||[])],opis:e.opis||'',tz:entry?entry.tz:devTz(),vitc:e.vitc_mg||null,photo:null,thumb:null,sets:(e.sets||[]).map(x=>({...x}))};
  const t=T[cur.typ],sc=SCALE[cur.typ],whenVal=entry?entry.local.replace(' ','T'):localStr(new Date(),devTz()).replace(' ','T');
  let f='';
  if(cur.typ==='bol')f+=`<label for="f_il">Nasilenie: <b id="f_v">${cur.ilosc??0}</b>/10</label><input id="f_il" type="range" min="0" max="10" value="${cur.ilosc??0}">`;
- else if(sc)f+=`<label>${cur.typ==='pobudka'?'Jakość snu':cur.typ==='alergia'?'Nasilenie objawów':'Poziom energii'}</label><div class="chips">${Array.from({length:sc[1]-sc[0]+1},(_,i)=>i+sc[0]).map(n=>`<button class="chip ${+cur.ilosc===n?'on':''}" data-sc="${n}">${n}</button>`).join('')}</div>`;
- else if(t.u&&cur.typ!=='spac')f+=`<label for="f_il">Ilość (${t.u})${cur.typ==='posilek'?', opcjonalnie':''}</label><input id="f_il" type="number" inputmode="decimal" step="any" value="${esc(cur.ilosc)}">`;
+ else if(sc)f+=`${cur.typ==='pobudka'?`<p class="hint">Oceń 15–30 minut po wstaniu, biorąc pod uwagę trzy rzeczy: jak szybko zasnąłeś, ile razy się budziłeś i czy czujesz się wypoczęty.<br><b>1</b> – długo zasypiałeś, częste wybudzenia, wstajesz zmęczony<br><b>2</b> – słabo, kilka wybudzeń, ciężki poranek<br><b>3</b> – przeciętnie, da się funkcjonować<br><b>4</b> – dobrze, 1–2 krótkie wybudzenia, wypoczęty<br><b>5</b> – świetnie, szybko zasnąłeś, spałeś ciągiem, pełna energia</p>`:''}<label>${cur.typ==='pobudka'?'Jakość snu':cur.typ==='alergia'?'Nasilenie objawów':'Poziom energii'}</label><div class="chips">${Array.from({length:sc[1]-sc[0]+1},(_,i)=>i+sc[0]).map(n=>`<button class="chip ${+cur.ilosc===n?'on':''}" data-sc="${n}">${n}</button>`).join('')}</div>`;
+ else if(t.u&&cur.typ!=='spac')f+=`<label for="f_il">${cur.typ==='trening'?'Czas treningu lub spaceru (min)':`Ilość (${t.u})`}${cur.typ==='posilek'?', opcjonalnie':''}</label><input id="f_il" type="number" inputmode="decimal" step="any" value="${esc(cur.ilosc)}">`;
  if(cur.typ==='woda')f+=`<div class="chips" style="margin-top:8px">${[150,250,330,500,750].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div><div class="row" style="margin-top:12px"><button class="chip ${cur.vitc?'on':''}" data-vc="1">Z witaminą C</button><input id="f_vc" type="number" inputmode="numeric" style="width:110px" value="${esc(cur.vitc||S.vitc)}"><span class="hint" style="margin:0">mg</span></div>`;
+ if(cur.typ==='kawa')f+=`<div class="chips" style="margin-top:8px">${[50,100,250,400].map(n=>`<button class="chip" data-q="${n}">${n} ml</button>`).join('')}</div>`;
  if(cur.typ==='alkohol')f+=`<div class="chips" style="margin-top:8px">${[40,100,150,330,500].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div>`;
  if(cur.typ==='posilek')f+=`<label>Zdjęcie</label>${(cur.id&&TH[cur.id])?`<img src="${TH[cur.id]}" alt="" style="width:120px;border-radius:12px;display:block;margin-bottom:8px">`:''}<img id="f_prev" alt="" style="width:120px;border-radius:12px;display:none;margin-bottom:8px"><input id="f_ph" type="file" accept="image/*" capture="environment" style="display:none"><input id="f_ph2" type="file" accept="image/*" style="display:none"><div class="row"><button data-ph="f_ph">${cur.id?'Nowe zdjęcie':'Zrób zdjęcie'}</button><button data-ph="f_ph2">Z galerii</button></div>`;
- if(CO[cur.typ])f+=`<label>${cur.typ==='trening'?'Rodzaj':cur.typ==='bol'?'Gdzie boli':cur.typ==='suple'?'Co wziąłeś':cur.typ==='alkohol'?'Rodzaj':'Objawy'}</label><div class="chips">${CO[cur.typ].map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+ if(CO[cur.typ])f+=`<label>${cur.typ==='trening'?'Rodzaj':cur.typ==='bol'?'Gdzie boli':cur.typ==='suple'?'Co wziąłeś':cur.typ==='alkohol'?'Rodzaj':cur.typ==='kawa'?'Rodzaj kawy':'Objawy'}</label><div class="chips">${CO[cur.typ].map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+ if(cur.typ==='trening')f+=`<div id="bbs" style="display:${cur.co.includes('Body by Science')?'block':'none'}"><label>Ćwiczenia Body by Science</label><div id="sets">${setsHtml()}</div><button data-addex="1" style="width:100%;margin-top:4px">+ Dodaj ćwiczenie</button><div id="picker"></div></div>`;
  f+=`<label for="f_op">${cur.typ==='posilek'?'Co zjadłeś':'Notatka'}${cur.typ==='notatka'||cur.typ==='posilek'?'':' (opcjonalnie)'}</label><textarea id="f_op">${esc(cur.opis)}</textarea>`;
  f+=`<label for="f_when">Godzina (${esc(short(cur.tz))}${cur.tz!==devTz()?' – strefa z chwili wpisu':''})</label><input id="f_when" type="datetime-local" value="${whenVal}">`;
  $('#sh').innerHTML=`<h2>${entry?'Edytuj: ':''}${t.n}</h2>${f}<div class="acts">${entry?'<button class="danger" data-del="1">Usuń</button>':''}<button data-close="1">Anuluj</button><button class="pri" data-save="1">Zapisz</button></div>`;
  $('#sheet').classList.add('open');const il=$('#f_il');if(il&&il.type==='number')setTimeout(()=>il.focus(),50)}
-function closeSheet(){$('#sheet').classList.remove('open');cur=null}
-function saveSheet(){const il=$('#f_il');if(il)cur.ilosc=il.value===''?null:+il.value;if(cur.typ==='woda'){const v=+$('#f_vc').value||S.vitc;if(cur.vitc){cur.vitc=v;S.vitc=v;ls.set('settings',S);if(!cur.co.includes('Witamina C'))cur.co.push('Witamina C')}else cur.co=cur.co.filter(c=>c!=='Witamina C')}cur.opis=$('#f_op').value.trim();const when=$('#f_when').value;
- if(cur.id){const e=E[cur.id];const d=fromLocal(when,cur.tz);if(cur.thumb){TH[e.id]=cur.thumb;saveThumbs()}Object.assign(e,{vitc_mg:cur.vitc,ilosc:cur.ilosc,co:cur.co,opis:cur.opis,utc:d.toISOString(),local:localStr(d,cur.tz),offset_min:offMin(d,cur.tz)});push({op:'upsert',entry:cur.photo?Object.assign({},e,{foto_data:cur.photo}):e});toast('Zmieniono');closeSheet();render()}
- else{const nowStr=localStr(new Date(),devTz()).replace(' ','T');const t=cur.typ,f={ilosc:cur.ilosc,co:cur.co,opis:cur.opis,vitc_mg:cur.vitc,photo:cur.photo,thumb:cur.thumb,when:when&&when!==nowStr?when:null};closeSheet();add(t,f)}}
+function lastSet(ex){for(const e of list()){if(e.typ!=='trening'||e.id===cur.id||!e.sets)continue;const x=e.sets.find(s=>s.ex===ex&&(s.kg||s.reps||s.tul));if(x)return x}return null}
+function setsHtml(){return cur.sets.map((x,i)=>{const m=MUS[x.ex]||[x.ex,'',[]],l=lastSet(x.ex);return `<div class="set">${body(m[2],48)}<div><b>${esc(m[0])}</b><div class="g3"><input type="number" inputmode="decimal" step="any" placeholder="kg" aria-label="Obciążenie kg" value="${esc(x.kg)}" data-si="${i}" data-sf="kg"><input type="number" inputmode="numeric" placeholder="powt." aria-label="Powtórzenia" value="${esc(x.reps)}" data-si="${i}" data-sf="reps"><input type="number" inputmode="numeric" placeholder="sek." aria-label="Czas do załamania w sekundach" value="${esc(x.tul)}" data-si="${i}" data-sf="tul" id="tul${i}"></div><small>${l?`Ostatnio: ${l.kg??'–'} kg · ${l.reps??'–'} powt. · ${l.tul??'–'} s`:'Pierwszy raz'}</small><div class="row"><button data-swi="${i}">${sw&&sw.i===i?'Stop':'Stoper'}</button><button data-rm="${i}">Usuń</button></div></div></div>`}).join('')}
+function pickerHtml(){const gr=[...new Set(Object.values(MUS).map(m=>m[1]))];return gr.map(g=>`<p class="hint" style="margin:12px 0 0"><b>${g}</b></p><div class="ptiles">${Object.entries(MUS).filter(([,m])=>m[1]===g).map(([k,m])=>`<button data-ex="${k}">${body(m[2],40)}<span>${esc(m[0])}</span></button>`).join('')}</div>`).join('')}
+let sw=null;
+function closeSheet(){if(sw){clearInterval(sw.h);sw=null}$('#sheet').classList.remove('open');cur=null}
+function saveSheet(){const il=$('#f_il');if(il)cur.ilosc=il.value===''?null:+il.value;if(cur.typ==='woda'){const v=+$('#f_vc').value||S.vitc;if(cur.vitc){cur.vitc=v;S.vitc=v;ls.set('settings',S);if(!cur.co.includes('Witamina C'))cur.co.push('Witamina C')}else cur.co=cur.co.filter(c=>c!=='Witamina C')}cur.opis=$('#f_op').value.trim();const when=$('#f_when').value;if(sw){clearInterval(sw.h);sw=null}const sets=cur.co.includes('Body by Science')?cur.sets.filter(x=>x.kg!=null||x.reps!=null||x.tul!=null):[];
+ if(cur.id){const e=E[cur.id];const d=fromLocal(when,cur.tz);if(cur.thumb){TH[e.id]=cur.thumb;saveThumbs()}Object.assign(e,{sets,vitc_mg:cur.vitc,ilosc:cur.ilosc,co:cur.co,opis:cur.opis,utc:d.toISOString(),local:localStr(d,cur.tz),offset_min:offMin(d,cur.tz)});push({op:'upsert',entry:cur.photo?Object.assign({},e,{foto_data:cur.photo}):e});toast('Zmieniono');closeSheet();render()}
+ else{const nowStr=localStr(new Date(),devTz()).replace(' ','T');const t=cur.typ,f={ilosc:cur.ilosc,co:cur.co,opis:cur.opis,vitc_mg:cur.vitc,sets,photo:cur.photo,thumb:cur.thumb,when:when&&when!==nowStr?when:null};closeSheet();add(t,f)}}
 
 /* ---------- Ekran: Historia ---------- */
 let filt='';
@@ -201,7 +243,7 @@ function vHistoria(){const L=list().filter(e=>!filt||e.typ===filt);const days=[.
  return `<div class="chips" style="margin-bottom:6px"><button class="chip ${!filt?'on':''}" data-f="">Wszystko</button>${types.map(k=>`<button class="chip ${filt===k?'on':''}" data-f="${k}">${T[k].n}</button>`).join('')}</div>
  ${days.length?days.map(d=>{const w=sumDay('woda',d),sl=sleepFor(d);return `<div class="day"><b>${dayName(d)}</b><span>${w?'woda '+(w/1000).toFixed(1).replace('.',',')+' l':''}${sl?' · sen '+sl.toFixed(1).replace('.',',')+' h':''}</span></div>`+
   L.filter(e=>dayOf(e)===d).map(e=>{const away=e.tz!==S.home;const homeT=away?localStr(new Date(e.utc),S.home).slice(11):'';
-   return `<button class="ent" style="--c:${T[e.typ].c}" data-edit="${e.id}"><i></i><span class="m"><b>${T[e.typ].n}</b> ${esc(val(e))}${pending(e.id)?'<span class="pend" title="Czeka na wysłanie"></span>':''}${(e.co&&e.co.length)||e.opis?`<small>${esc([...(e.co||[]).filter(c=>!(e.typ==='woda'&&c==='Witamina C')),e.opis].filter(Boolean).join(' · '))}</small>`:''}${TH[e.id]?`<img src="${TH[e.id]}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-top:6px;display:block">`:e.foto?'<small>ze zdjęciem</small>':''}</span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${away?`<small>dom ${homeT}</small>`:''}</span></button>`}).join('')}).join('')
+   return `<button class="ent" style="--c:${T[e.typ].c}" data-edit="${e.id}"><i></i><span class="m"><b>${T[e.typ].n}</b> ${esc(val(e))}${pending(e.id)?'<span class="pend" title="Czeka na wysłanie"></span>':''}${(e.co&&e.co.length)||e.opis?`<small>${esc([...(e.co||[]).filter(c=>!(e.typ==='woda'&&c==='Witamina C')),e.opis].filter(Boolean).join(' · '))}</small>`:''}${e.sets&&e.sets.length?`<small>${esc(e.sets.map(x=>(MUS[x.ex]?MUS[x.ex][0].split(' (')[0]:x.ex)+' '+(x.kg??'–')+' kg × '+(x.reps??'–')+', '+(x.tul??'–')+' s').join(' · '))}</small>`:''}${TH[e.id]?`<img src="${TH[e.id]}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-top:6px;display:block">`:e.foto?'<small>ze zdjęciem</small>':''}</span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${away?`<small>dom ${homeT}</small>`:''}</span></button>`}).join('')}).join('')
  :'<section class="card"><p style="margin:0">Brak wpisów. Dodaj pierwszy na ekranie Dodaj.</p></section>'}`}
 
 /* ---------- Ekran: Zalecenia ---------- */
@@ -214,11 +256,21 @@ function vZal(){const d=todayLocal();const dz=R.filter(r=>r.data===d),og=R.filte
  <section class="card"><h2>Ćwiczenia</h2>${grp.map(g=>`<p class="hint" style="margin:12px 0 0"><b>${g}</b></p>${EX.filter(x=>x[0]===g).map(x=>`<details><summary>${x[1]}</summary><p style="margin:6px 0">${x[2]}</p><a href="${x[3]}" target="_blank" rel="noopener">Film (wymaga internetu)</a></details>`).join('')}`).join('')}</section>`}
 
 /* ---------- Ekran: Postęp ---------- */
+let pex='';
+function mini(pts,title,unit){if(!pts.length)return'';const vs=pts.map(p=>p.v),lo=Math.min(...vs),hi=Math.max(...vs),span=(hi-lo)||1,n=pts.length;const X=i=>n===1?165:24+i*(286/(n-1)),Y=v=>78-((v-lo)/span)*58;
+ const f=v=>String(Math.round(v*10)/10).replace('.',',');const dv=n>1?vs[n-1]-vs[0]:0;
+ return `<div class="mini"><div class="row" style="justify-content:space-between"><b>${title}</b><span class="hint" style="margin:0">ostatnio ${f(vs[n-1])} ${unit}${n>1?` · ${dv>=0?'+':''}${f(dv)} od startu`:''}</span></div><svg viewBox="0 0 320 100" width="100%" role="img" aria-label="${title}"><text x="2" y="${Y(hi)+4}" font-size="10" fill="var(--mute)">${f(hi)}</text>${hi!==lo?`<text x="2" y="${Y(lo)+4}" font-size="10" fill="var(--mute)">${f(lo)}</text>`:''}<line x1="24" x2="310" y1="${Y(lo)}" y2="${Y(lo)}" stroke="var(--line)"/><path d="${pts.map((p,i)=>(i?'L':'M')+X(i).toFixed(1)+' '+Y(p.v).toFixed(1)).join('')}" fill="none" stroke="var(--sea)" stroke-width="2.5" stroke-linejoin="round"/>${pts.map((p,i)=>`<circle cx="${X(i).toFixed(1)}" cy="${Y(p.v).toFixed(1)}" r="3.5" fill="var(--sea)"/>`).join('')}<text x="24" y="97" font-size="10" fill="var(--mute)">${dayName(pts[0].d)}</text>${n>1?`<text x="310" y="97" font-size="10" text-anchor="end" fill="var(--mute)">${dayName(pts[n-1].d)}</text>`:''}</svg></div>`}
+function vBbs(){const L=list().slice().reverse().filter(e=>e.typ==='trening'&&e.sets&&e.sets.length);const ex=[...new Set(L.flatMap(e=>e.sets.map(x=>x.ex)))];
+ if(!ex.length)return `<section class="card"><h2>Body by Science</h2><p class="hint" style="margin:0">Wykresy obciążenia, powtórzeń i czasu pojawią się po pierwszym treningu z wpisanymi ćwiczeniami.</p></section>`;
+ if(!ex.includes(pex))pex=ex[0];const m=MUS[pex]||[pex,'',[]];const rows=L.flatMap(e=>e.sets.filter(x=>x.ex===pex).map(x=>({d:dayOf(e),...x})));
+ const P=k=>rows.filter(x=>x[k]!=null&&x[k]!=='').map(x=>({d:x.d,v:+x[k]}));
+ return `<section class="card"><h2>Body by Science</h2><div class="chips">${ex.map(k=>`<button class="chip ${k===pex?'on':''}" data-pex="${k}">${esc(MUS[k]?MUS[k][0].split(' (')[0]:k)}</button>`).join('')}</div>
+ <div class="row" style="margin-top:12px;flex-wrap:nowrap">${body(m[2],64)}<b>${esc(m[0])}</b></div>${mini(P('kg'),'Obciążenie','kg')}${mini(P('reps'),'Powtórzenia','')}${mini(P('tul'),'Czas do załamania','s')}<p class="hint">Cel: czas 60–120 s. Gdy przekraczasz 120 s, następnym razem dodaj ok. 5% ciężaru.</p></section>`}
 function vPostep(){const ds=[...Array(14)].map((_,i)=>{const d=new Date(Date.now()-(13-i)*864e5);return localStr(d,devTz()).slice(0,10)});const cel=S.cel||3000;
  const lastOf=(typ,d)=>{const x=list().find(e=>e.typ===typ&&dayOf(e)===d);return x?+x.ilosc:null};
  const bar=(d,v,max,lbl,warn)=>`<div class="b"><span>${dayName(d).replace(/^\S+\s/,'')}</span><div class="tr"><i style="width:${Math.min(100,(v||0)/max*100)}%;${warn?'background:var(--acc)':''}"></i></div><span class="v">${lbl}</span></div>`;
  const pain=d=>{const x=list().filter(e=>e.typ==='bol'&&dayOf(e)===d);return x.length?Math.max(...x.map(e=>+e.ilosc||0)):null};
- return `<section class="card"><h2>Woda (cel ${(cel/1000).toFixed(1).replace('.',',')} l)</h2><div class="bars">${ds.map(d=>{const w=sumDay('woda',d);return bar(d,w,cel,w?(w/1000).toFixed(1).replace('.',','):'–',w&&w<cel*.6)}).join('')}</div></section>
+ return vBbs()+`<section class="card"><h2>Woda (cel ${(cel/1000).toFixed(1).replace('.',',')} l)</h2><div class="bars">${ds.map(d=>{const w=sumDay('woda',d);return bar(d,w,cel,w?(w/1000).toFixed(1).replace('.',','):'–',w&&w<cel*.6)}).join('')}</div></section>
  <section class="card"><h2>Sen</h2><div class="bars">${ds.map(d=>{const s=sleepFor(d);return bar(d,s,9,s?s.toFixed(1).replace('.',',')+' h':'–',s&&s<6)}).join('')}</div></section>
  <section class="card"><h2>Ból (najwyższy w dniu)</h2><div class="bars">${ds.map(d=>{const p=pain(d);return bar(d,p,10,p==null?'–':p+'/10',p>3)}).join('')}</div></section>
  <section class="card"><h2>Waga</h2><div class="bars">${ds.map(d=>{const w=lastOf('waga',d);return bar(d,w?w-80:0,15,w?String(w).replace('.',',')+' kg':'–')}).join('')}</div><p class="hint">Pasek od 80 do 95 kg. Cel ok. 87 kg.</p></section>`}
@@ -241,6 +293,7 @@ $('#view').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
  else if(d.open)openSheet(d.open);
  else if(d.edit)openSheet(null,E[d.edit]);
  else if(d.f!==undefined){filt=d.f;render()}
+ else if(d.pex){pex=d.pex;render()}
  else if(d.ss){S.url=$('#s_url').value.trim();S.key=$('#s_key').value.trim();S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S);toast('Zapisano ustawienia');sync()}});
 $('#view').addEventListener('change',e=>{if(['s_home','s_cel','s_vc'].includes(e.target.id)){S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S)}});
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
@@ -250,9 +303,14 @@ $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();
  else if(d.q){$('#f_il').value=d.q}
  else if(d.vc){cur.vitc=cur.vitc?null:(+$('#f_vc').value||S.vitc);b.classList.toggle('on')}
  else if(d.ph){$('#'+d.ph).click()}
- else if(d.co){const i=cur.co.indexOf(d.co);i<0?cur.co.push(d.co):cur.co.splice(i,1);b.classList.toggle('on')}});
+ else if(d.co){if(SINGLE[cur.typ]){cur.co=cur.co[0]===d.co?[]:[d.co];b.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',cur.co.includes(c.dataset.co)))}else{const i=cur.co.indexOf(d.co);i<0?cur.co.push(d.co):cur.co.splice(i,1);b.classList.toggle('on')}
+  if(d.co==='Body by Science'){$('#bbs').style.display=cur.co.includes('Body by Science')?'block':'none'}}
+ else if(d.addex){const p=$('#picker');p.innerHTML=p.innerHTML?'':pickerHtml()}
+ else if(d.ex){const l=lastSet(d.ex);cur.sets.push({ex:d.ex,kg:l?l.kg:null,reps:null,tul:null});$('#picker').innerHTML='';$('#sets').innerHTML=setsHtml()}
+ else if(d.rm){cur.sets.splice(+d.rm,1);if(sw){clearInterval(sw.h);sw=null}$('#sets').innerHTML=setsHtml()}
+ else if(d.swi!==undefined){const i=+d.swi;if(sw&&sw.i===i){const sec=Math.round((Date.now()-sw.t0)/1000);clearInterval(sw.h);sw=null;cur.sets[i].tul=sec;$('#sets').innerHTML=setsHtml()}else{if(sw)clearInterval(sw.h);sw={i,t0:Date.now()};sw.h=setInterval(()=>{const el=$('#tul'+i);if(el)el.value=Math.round((Date.now()-sw.t0)/1000)},500);$('#sets').innerHTML=setsHtml()}}});
 $('#sheet').addEventListener('change',async e=>{if(!['f_ph','f_ph2'].includes(e.target.id)||!e.target.files[0])return;try{const f=e.target.files[0];cur.photo=await shrink(f,1024,.72);cur.thumb=await shrink(f,240,.6);const p=$('#f_prev');p.src=cur.thumb;p.style.display='block'}catch(x){toast('Nie udało się wczytać zdjęcia')}});
-$('#sheet').addEventListener('input',e=>{if(e.target.id==='f_il'&&e.target.type==='range')$('#f_v').textContent=e.target.value});
+$('#sheet').addEventListener('input',e=>{if(e.target.id==='f_il'&&e.target.type==='range')$('#f_v').textContent=e.target.value;const d=e.target.dataset;if(d.si!==undefined&&cur){cur.sets[+d.si][d.sf]=e.target.value===''?null:+e.target.value}});
 addEventListener('online',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();sync()}});
 setInterval(clock,30000);setInterval(()=>{if(Q.length)sync()},60000);
 render();sync();
