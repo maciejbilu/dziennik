@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#0a6aa1">
+<meta name="theme-color" content="#0a6aa1" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#120805" media="(prefers-color-scheme: dark)">
 <title>Mój dziennik</title>
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon.svg" type="image/svg+xml">
@@ -13,7 +13,8 @@
    PICTURE: duży pierścień wody na ekranie Dodaj
    COLOUR and TYPE: błękit wody, biel, koralowy akcent; systemowy krój, grube cyfry
    LAYOUT: jedna kolumna, dolny pasek nawigacji, arkusz wpisu wysuwany od dołu */
-:root{color-scheme:light dark;--mus:light-dark(#c9d6de,#2b4a5a);--bg:light-dark(#fff,#06161f);--card:light-dark(#eef5f9,#0d2531);--ink:light-dark(#0b2230,#e3f0f6);--mute:light-dark(#4f6775,#93abb8);--sea:light-dark(#0a6aa1,#3fb0e8);--sea2:light-dark(#cfe6f2,#123a4d);--acc:#ff5a3c;--ok:light-dark(#0a7d55,#43c995);--line:light-dark(#d6e3ea,#1c3a49)}
+/* Tryb nocny: ciepłe barwy bez niebieskiego, przyjazne zasypianiu */
+:root{color-scheme:light dark;--mus:light-dark(#c9d6de,#4a2a1a);--bg:light-dark(#fff,#120805);--card:light-dark(#eef5f9,#24120a);--ink:light-dark(#0b2230,#f2d6bd);--mute:light-dark(#4f6775,#b48a6c);--sea:light-dark(#0a6aa1,#e07b39);--sea2:light-dark(#cfe6f2,#3d1f10);--acc:light-dark(#ff5a3c,#e5533d);--ok:light-dark(#0a7d55,#d4a23c);--line:light-dark(#d6e3ea,#3a2014);--onacc:light-dark(#fff,#1a0b05);--rec:light-dark(#0a6aa1,#5a2a12);--hl:light-dark(#e5383b,#ff7a45)}
 :root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
 *{box-sizing:border-box;min-width:0}
 body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
@@ -26,12 +27,12 @@ header{display:flex;align-items:center;justify-content:space-between;gap:10px;fl
 .now b{color:var(--ink);font-size:16px;font-variant-numeric:tabular-nums}
 button,select{font:inherit;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 14px;cursor:pointer}
 button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
-.pri{background:var(--sea);color:#fff;border-color:var(--sea);font-weight:600}
+.pri{background:var(--sea);color:var(--onacc);border-color:var(--sea);font-weight:600}
 .danger{color:var(--acc);border-color:var(--acc)}
 .card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:14px}
 .row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .chips{display:flex;gap:8px;flex-wrap:wrap}
-.chip.on{background:var(--sea);color:#fff;border-color:var(--sea)}
+.chip.on{background:var(--sea);color:var(--onacc);border-color:var(--sea)}
 label{font-size:14px;color:var(--mute);display:block;margin:10px 0 4px}
 input[type=number],input[type=text],input[type=url],input[type=datetime-local],textarea{font:inherit;font-size:16px;width:100%;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px}
 textarea{padding:10px 12px;min-height:70px}
@@ -70,7 +71,7 @@ nav a.on{color:var(--sea)}nav a.on i{opacity:1}
 .bars .b{display:grid;grid-template-columns:62px minmax(0,1fr) 54px;gap:8px;align-items:center;font-size:14px;margin:4px 0}
 .bars .tr{height:12px;border-radius:6px;background:var(--sea2);overflow:hidden}.bars .tr i{display:block;height:100%;background:var(--sea);border-radius:6px}
 .bars .v{text-align:right;font-variant-numeric:tabular-nums}
-.rec{background:#0a6aa1;color:#fff}.rec .hint{color:#ffffffcc}
+.rec{background:var(--rec);color:#fff7ef}.rec .hint{color:#fff7efcc}
 details{border-top:1px solid var(--line);padding:10px 0}details summary{font-weight:600;cursor:pointer;min-height:32px}
 .mus{flex:none;display:block}
 .set{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;background:var(--card);border-radius:14px;padding:10px;margin:8px 0}
@@ -102,6 +103,7 @@ a{color:var(--sea)}
 </nav>
 <div class="sheet" id="sheet"><div id="sh"></div></div>
 <div class="toast" id="toast"></div>
+<input id="pdfIn" type="file" accept="application/pdf,.pdf" style="display:none">
 <script>
 {
 /* ---------- Dane i typy ---------- */
@@ -110,6 +112,9 @@ const T={
  spac:{n:'Idę spać',u:'',c:'#6b5bd6'},pobudka:{n:'Pobudka',u:'/5',c:'#e2b714'},drzemka:{n:'Drzemka',u:'min',c:'#7d8b96'},
  trening:{n:'Trening',u:'min',c:'#0a7d55'},suple:{n:'Suplementy',u:'',c:'#d0508a'},bol:{n:'Ból',u:'/10',c:'#ff5a3c'},
  alergia:{n:'Alergia',u:'/3',c:'#f07b2c'},energia:{n:'Energia',u:'/5',c:'#c9a400'},waga:{n:'Waga',u:'kg',c:'#55707f'},alkohol:{n:'Alkohol',u:'ml',c:'#8e3b5c'},lot:{n:'Lot',u:'',c:'#1d3557'},sluzba:{n:'Służba',u:'',c:'#7a8a99'},notatka:{n:'Notatka',u:'',c:'#9aa7b0'}};
+const NIGHT={woda:'#e07b39',posilek:'#d9a441',kawa:'#a0522d',spac:'#c0504d',pobudka:'#e0b04a',drzemka:'#8c6a55',trening:'#cf7a3a',suple:'#d4706a',bol:'#e5533d',alergia:'#d98a3a',energia:'#e3b448',waga:'#9a7a66',notatka:'#8a7568',alkohol:'#b5485d',lot:'#a35a3a',sluzba:'#7d6355'};
+const DARK=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):{matches:false};
+const col=k=>DARK.matches&&NIGHT[k]?NIGHT[k]:T[k].c;
 const CO={trening:['Body by Science','Izometria kolan','Kolana powolne','Kręgosłup','Spacer'],
  suple:['D3','Magnez','Omega-3','Kreatyna','Kolagen + C','Witamina C'],bol:['Kolano lewe','Kolano prawe','Plecy'],
  alergia:['Katar','Oczy','Kichanie','Lek przeciwhistaminowy'],alkohol:['Piwo','Wino','Wódka / mocny','Cydr','Inne'],kawa:['Czarna','Z mlekiem']};
@@ -153,7 +158,7 @@ const MUS={
 const HEAD='<circle cx="14" cy="4" r="3.2"/>',DELT='<circle cx="7.6" cy="11" r="2.5"/><circle cx="20.4" cy="11" r="2.5"/>',ARM='<ellipse cx="6.2" cy="16.6" rx="1.6" ry="3.2"/><ellipse cx="21.8" cy="16.6" rx="1.6" ry="3.2"/>',FORE='<ellipse cx="5.4" cy="23.2" rx="1.3" ry="3"/><ellipse cx="22.6" cy="23.2" rx="1.3" ry="3"/>',THIGH='<ellipse cx="10.8" cy="33.6" rx="2.4" ry="5.6"/><ellipse cx="17.2" cy="33.6" rx="2.4" ry="5.6"/>';
 const BODY={F:[['',HEAD],['delt',DELT],['chest','<ellipse cx="11.6" cy="12.2" rx="2.6" ry="2.2"/><ellipse cx="16.4" cy="12.2" rx="2.6" ry="2.2"/>'],['bic',ARM],['',FORE],['abs','<rect x="11.6" y="15" width="4.8" height="9" rx="1.5"/>'],['obl','<rect x="9.2" y="15.6" width="2" height="7" rx="1"/><rect x="16.8" y="15.6" width="2" height="7" rx="1"/>'],['add','<ellipse cx="14" cy="28.8" rx="1.5" ry="2.6"/>'],['quad',THIGH],['','<ellipse cx="10.8" cy="43.6" rx="1.6" ry="4"/><ellipse cx="17.2" cy="43.6" rx="1.6" ry="4"/>']],
  B:[['',HEAD],['trap','<ellipse cx="14" cy="9.2" rx="4.6" ry="2"/>'],['rdelt',DELT],['upper','<rect x="11" y="11.6" width="6" height="3.8" rx="1"/>'],['lat','<ellipse cx="10.2" cy="16.6" rx="2.3" ry="4"/><ellipse cx="17.8" cy="16.6" rx="2.3" ry="4"/>'],['tri',ARM],['',FORE],['low','<rect x="12" y="20.6" width="4" height="4.2" rx="1"/>'],['gmed','<ellipse cx="9" cy="25" rx="1.4" ry="1.7"/><ellipse cx="19" cy="25" rx="1.4" ry="1.7"/>'],['glute','<ellipse cx="11.3" cy="27.8" rx="2.7" ry="2.5"/><ellipse cx="16.7" cy="27.8" rx="2.7" ry="2.5"/>'],['ham',THIGH.replace(/33\.6/g,'34.6')],['calf','<ellipse cx="10.8" cy="43.6" rx="2" ry="4"/><ellipse cx="17.2" cy="43.6" rx="2" ry="4"/>']]};
-function body(reg,w){w=w||44;const rr=new Set(reg);const g=v=>BODY[v].map(([id,x])=>`<g fill="${id&&rr.has(v+':'+id)?'#e5383b':'var(--mus)'}">${x}</g>`).join('');return `<svg class="mus" viewBox="0 0 60 50" width="${w}" height="${Math.round(w*50/60)}" aria-hidden="true">${g('F')}<g transform="translate(32 0)">${g('B')}</g></svg>`}
+function body(reg,w){w=w||44;const rr=new Set(reg);const g=v=>BODY[v].map(([id,x])=>`<g fill="${id&&rr.has(v+':'+id)?'var(--hl)':'var(--mus)'}">${x}</g>`).join('');return `<svg class="mus" viewBox="0 0 60 50" width="${w}" height="${Math.round(w*50/60)}" aria-hidden="true">${g('F')}<g transform="translate(32 0)">${g('B')}</g></svg>`}
 /* ---------- Grafik lotów (PDF z CrewLink / NetLine) ----------
    Godziny w grafiku są w UTC. Każdy lot zapisujemy z godziną lokalną lotniska wylotu. */
 const AP={WAW:'Europe/Warsaw',KTW:'Europe/Warsaw',WRO:'Europe/Warsaw',KRK:'Europe/Warsaw',GDN:'Europe/Warsaw',POZ:'Europe/Warsaw',RZE:'Europe/Warsaw',SZZ:'Europe/Warsaw',BZG:'Europe/Warsaw',LUZ:'Europe/Warsaw',
@@ -275,7 +280,7 @@ function vDodaj(){const day=todayLocal(),w=sumDay('woda',day),cel=S.cel||3000,p=
  return rosterNag()+`<section class="card"><h2>Woda dziś</h2><div class="water"><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--sea2)" stroke-width="12"/><circle class="v" cx="60" cy="60" r="52" fill="none" stroke="${p>=1?'var(--ok)':'var(--sea)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}"/></svg><div><b>${(w/1000).toFixed(2).replace('.',',')}</b><span>z ${(cel/1000).toFixed(1).replace('.',',')} l</span></div></div>
  <div class="wbtn"><button class="pri" data-w="250">+250 ml</button><button class="pri" data-w="500">+500 ml</button><button class="pri" data-w="500" data-c="1">+500 z wit. C</button><button data-open="woda">Inna ilość</button>${lastW?`<button data-undo="${lastW.id}">Cofnij ${esc(lastW.ilosc)} ml</button>`:''}</div></div>
  <p class="hint">W locie 200–250 ml co godzinę służby. Kawa i herbata się nie liczą.</p></section>
- <section><div class="tiles">${tiles.map(k=>`<button class="tile" style="--c:${T[k].c}" data-open="${k}"><i></i>${T[k].n}${k==='kawa'?`<small>dziś ${list().filter(e=>e.typ==='kawa'&&dayOf(e)===day).length}</small>`:''}</button>`).join('')}</div></section>`}
+ <section><div class="tiles">${tiles.map(k=>`<button class="tile" style="--c:${col(k)}" data-open="${k}"><i></i>${T[k].n}${k==='kawa'?`<small>dziś ${list().filter(e=>e.typ==='kawa'&&dayOf(e)===day).length}</small>`:''}</button>`).join('')}</div></section>`}
 
 /* ---------- Arkusz wpisu (nowy lub edycja) ---------- */
 let cur=null;
@@ -311,8 +316,8 @@ function vHistoria(){const L=list().filter(e=>e.typ!=='grafik'&&(!filt||e.typ===
  return `<div class="chips" style="margin-bottom:6px"><button class="chip ${!filt?'on':''}" data-f="">Wszystko</button>${types.map(k=>`<button class="chip ${filt===k?'on':''}" data-f="${k}">${T[k].n}</button>`).join('')}</div>
  ${days.length?days.map(d=>{const w=sumDay('woda',d),sl=sleepFor(d);return `<div class="day"><b>${dayName(d)}</b><span>${w?'woda '+(w/1000).toFixed(1).replace('.',',')+' l':''}${sl?' · sen '+sl.toFixed(1).replace('.',',')+' h':''}</span></div>`+
   L.filter(e=>dayOf(e)===d).map(e=>{const away=e.tz!==S.home;const homeT=away?localStr(new Date(e.utc),S.home).slice(11):'';
-   if(e.typ==='lot'||e.typ==='sluzba'){const tz2=e.typ==='lot'?(AP[e.to]||'UTC'):e.tz;return `<div class="ent" style="--c:${T[e.typ].c}"><i></i><span class="m"><b>${esc(e.typ==='lot'?e.fn+' '+e.from+' → '+e.to:e.code)}</b>${e.dh?' <small style="display:inline">przelot</small>':''}<small>${e.ci_utc?'odprawa '+hm(e.ci_utc,e.tz)+' · ':''}${e.typ==='lot'?'przylot '+hm(e.arr_utc,tz2)+' '+esc(short(tz2)):'do '+hm(e.arr_utc,e.tz)}</small></span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${e.tz!==S.home?`<small>dom ${localStr(new Date(e.utc),S.home).slice(11)}</small>`:''}</span></div>`}
-   return `<button class="ent" style="--c:${T[e.typ].c}" data-edit="${e.id}"><i></i><span class="m"><b>${T[e.typ].n}</b> ${esc(val(e))}${pending(e.id)?'<span class="pend" title="Czeka na wysłanie"></span>':''}${(e.co&&e.co.length)||e.opis?`<small>${esc([...(e.co||[]).filter(c=>!(e.typ==='woda'&&c==='Witamina C')),e.opis].filter(Boolean).join(' · '))}</small>`:''}${e.sets&&e.sets.length?`<small>${esc(e.sets.map(x=>(MUS[x.ex]?MUS[x.ex][0].split(' (')[0]:x.ex)+' '+(x.kg??'–')+' kg × '+(x.reps??'–')+', '+(x.tul??'–')+' s').join(' · '))}</small>`:''}${TH[e.id]?`<img src="${TH[e.id]}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-top:6px;display:block">`:e.foto?'<small>ze zdjęciem</small>':''}</span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${away?`<small>dom ${homeT}</small>`:''}</span></button>`}).join('')}).join('')
+   if(e.typ==='lot'||e.typ==='sluzba'){const tz2=e.typ==='lot'?(AP[e.to]||'UTC'):e.tz;return `<div class="ent" style="--c:${col(e.typ)}"><i></i><span class="m"><b>${esc(e.typ==='lot'?e.fn+' '+e.from+' → '+e.to:e.code)}</b>${e.dh?' <small style="display:inline">przelot</small>':''}<small>${e.ci_utc?'odprawa '+hm(e.ci_utc,e.tz)+' · ':''}${e.typ==='lot'?'przylot '+hm(e.arr_utc,tz2)+' '+esc(short(tz2)):'do '+hm(e.arr_utc,e.tz)}</small></span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${e.tz!==S.home?`<small>dom ${localStr(new Date(e.utc),S.home).slice(11)}</small>`:''}</span></div>`}
+   return `<button class="ent" style="--c:${col(e.typ)}" data-edit="${e.id}"><i></i><span class="m"><b>${T[e.typ].n}</b> ${esc(val(e))}${pending(e.id)?'<span class="pend" title="Czeka na wysłanie"></span>':''}${(e.co&&e.co.length)||e.opis?`<small>${esc([...(e.co||[]).filter(c=>!(e.typ==='woda'&&c==='Witamina C')),e.opis].filter(Boolean).join(' · '))}</small>`:''}${e.sets&&e.sets.length?`<small>${esc(e.sets.map(x=>(MUS[x.ex]?MUS[x.ex][0].split(' (')[0]:x.ex)+' '+(x.kg??'–')+' kg × '+(x.reps??'–')+', '+(x.tul??'–')+' s').join(' · '))}</small>`:''}${TH[e.id]?`<img src="${TH[e.id]}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-top:6px;display:block">`:e.foto?'<small>ze zdjęciem</small>':''}</span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${away?`<small>dom ${homeT}</small>`:''}</span></button>`}).join('')}).join('')
  :'<section class="card"><p style="margin:0">Brak wpisów. Dodaj pierwszy na ekranie Dodaj.</p></section>'}`}
 
 /* ---------- Ekran: Zalecenia ---------- */
@@ -350,7 +355,7 @@ function vPostep(){const ds=[...Array(14)].map((_,i)=>{const d=new Date(Date.now
 /* ---------- Ekran: Ustawienia ---------- */
 function vUst(){return `<section class="card"><h2>Połączenie z arkuszem</h2><label for="s_url">Adres skryptu (Apps Script)</label><input id="s_url" type="url" value="${esc(S.url)}" placeholder="https://script.google.com/macros/s/…/exec"><label for="s_key">Tajny klucz</label><input id="s_key" type="text" value="${esc(S.key)}" autocomplete="off"><div class="row" style="margin-top:12px"><button class="pri" data-ss="1">Zapisz i synchronizuj</button></div></section>
  <section class="card"><h2>Strefa domowa i cele</h2><label for="s_home">Strefa domowa</label><input id="s_home" type="text" value="${esc(S.home)}"><p class="hint">Telefon jest teraz w strefie ${esc(devTz())} (${esc(short(devTz()))}). Każdy wpis zapisuje swoją strefę, więc godziny z postojów się nie mieszają.</p><label for="s_cel">Cel wody (ml)</label><input id="s_cel" type="number" value="${esc(S.cel)}"><label for="s_vc">Witamina C w wodzie, domyślna dawka (mg)</label><input id="s_vc" type="number" value="${esc(S.vitc)}"><p class="hint">Mieszanka askorbinianu sodu z kwasem askorbinowym. Przycisk „+500 z wit. C” zapisuje tę dawkę.</p></section>
- <section class="card"><h2>Grafik lotów</h2><p class="hint" style="margin:0 0 10px">Wgraj PDF „Individual plan” z CrewLink. Godziny z grafiku (UTC) zamienię na lokalne. Ponowne wgranie tego samego miesiąca (np. v2) zastępuje poprzednią wersję.</p><input id="s_pdf" type="file" accept="application/pdf,.pdf" style="display:none"><button class="pri" data-pdf="1">Wgraj grafik (PDF)</button><p class="hint" id="pdfmsg"></p><h2 style="margin-top:14px">Wgrane grafiki (pamiętam 2 ostatnie)</h2>${rostersHtml()}</section>
+ <section class="card"><h2>Grafik lotów</h2><p class="hint" style="margin:0 0 10px">Wgraj PDF „Individual plan” z CrewLink. Godziny z grafiku (UTC) zamienię na lokalne. Ponowne wgranie tego samego miesiąca (np. v2) zastępuje poprzednią wersję.</p><button class="pri" data-pdf="1">Wgraj grafik (PDF)</button><p class="hint" id="pdfmsg">${esc(pdfMsg)}</p><h2 style="margin-top:14px">Wgrane grafiki (pamiętam 2 ostatnie)</h2>${rostersHtml()}</section>
  <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
 
 /* ---------- Render i zdarzenia ---------- */
@@ -367,9 +372,9 @@ $('#view').addEventListener('click',e=>{const b=e.target.closest('button');if(!b
  else if(d.edit)openSheet(null,E[d.edit]);
  else if(d.f!==undefined){filt=d.f;render()}
  else if(d.pex){pex=d.pex;render()}
- else if(d.pdf){$('#s_pdf').click()}
+ else if(d.pdf){$('#pdfIn').click()}
  else if(d.ss){S.url=$('#s_url').value.trim();S.key=$('#s_key').value.trim();S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S);toast('Zapisano ustawienia');sync()}});
-$('#view').addEventListener('change',async e=>{if(e.target.id==='s_pdf'&&e.target.files[0]){const msg=$('#pdfmsg');msg.textContent='Czytam grafik…';try{const t=await importRoster(e.target.files[0]);toast('Grafik wgrany');render();$('#pdfmsg').textContent='Wgrano: '+t}catch(x){msg.textContent='Nie udało się: '+(x.message||x)}e.target.value='';return}if(['s_home','s_cel','s_vc'].includes(e.target.id)){S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S)}});
+$('#view').addEventListener('change',async e=>{if(['s_home','s_cel','s_vc'].includes(e.target.id)){S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S)}});
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.close)closeSheet();else if(d.save)saveSheet();
  else if(d.del){const x=E[cur.id];delete E[cur.id];push({op:'delete',id:x.id});closeSheet();toast('Usunięto');render()}
@@ -385,7 +390,12 @@ $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();
  else if(d.swi!==undefined){const i=+d.swi;if(sw&&sw.i===i){const sec=Math.round((Date.now()-sw.t0)/1000);clearInterval(sw.h);sw=null;cur.sets[i].tul=sec;$('#sets').innerHTML=setsHtml()}else{if(sw)clearInterval(sw.h);sw={i,t0:Date.now()};sw.h=setInterval(()=>{const el=$('#tul'+i);if(el)el.value=Math.round((Date.now()-sw.t0)/1000)},500);$('#sets').innerHTML=setsHtml()}}});
 $('#sheet').addEventListener('change',async e=>{if(!['f_ph','f_ph2'].includes(e.target.id)||!e.target.files[0])return;try{const f=e.target.files[0];cur.photo=await shrink(f,1024,.72);cur.thumb=await shrink(f,240,.6);const p=$('#f_prev');p.src=cur.thumb;p.style.display='block'}catch(x){toast('Nie udało się wczytać zdjęcia')}});
 $('#sheet').addEventListener('input',e=>{if(e.target.id==='f_il'&&e.target.type==='range')$('#f_v').textContent=e.target.value;const d=e.target.dataset;if(d.si!==undefined&&cur){cur.sets[+d.si][d.sf]=e.target.value===''?null:+e.target.value}});
-addEventListener('online',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();sync()}});
+let pdfMsg='',picking=false;
+$('#pdfIn').addEventListener('change',async e=>{picking=false;const f=e.target.files[0];if(!f)return;pdfMsg='Czytam grafik '+f.name+'…';render();
+ try{const t=await importRoster(f);pdfMsg='Wgrano: '+t;toast('Grafik wgrany')}catch(x){pdfMsg='Nie udało się: '+(x.message||x);toast('Błąd grafiku')}e.target.value='';render()});
+$('#pdfIn').addEventListener('click',()=>{picking=true});
+DARK.addEventListener&&DARK.addEventListener('change',render);
+addEventListener('online',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!picking){render();sync()}});
 setInterval(clock,30000);setInterval(()=>{if(Q.length)sync()},60000);
 render();sync();
 if('serviceWorker' in navigator&&location.protocol==='https:'){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
