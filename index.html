@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0a6aa1">
+<title>Mój dziennik</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon.svg" type="image/svg+xml">
+<style>
+/* VOICE: spokojny dziennik pokładowy, szybkie wpisy kciukiem
+   IDEA: wskaźnik poziomu wody w zbiorniku + kafle jak przełączniki w kokpicie
+   PICTURE: duży pierścień wody na ekranie Dodaj
+   COLOUR and TYPE: błękit wody, biel, koralowy akcent; systemowy krój, grube cyfry
+   LAYOUT: jedna kolumna, dolny pasek nawigacji, arkusz wpisu wysuwany od dołu */
+:root{color-scheme:light dark;--bg:light-dark(#fff,#06161f);--card:light-dark(#eef5f9,#0d2531);--ink:light-dark(#0b2230,#e3f0f6);--mute:light-dark(#4f6775,#93abb8);--sea:light-dark(#0a6aa1,#3fb0e8);--sea2:light-dark(#cfe6f2,#123a4d);--acc:#ff5a3c;--ok:light-dark(#0a7d55,#43c995);--line:light-dark(#d6e3ea,#1c3a49)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;overflow-x:clip;padding-bottom:calc(76px + env(safe-area-inset-bottom))}
+main{max-width:640px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top)) max(4vw,14px) 14px}
+h1{font-size:30px;line-height:1.05;margin:0;font-weight:800}
+h2{font-size:18px;margin:0 0 10px;font-weight:700}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
+.now{font-size:14px;color:var(--mute);text-align:right;line-height:1.3}
+.now b{color:var(--ink);font-size:16px;font-variant-numeric:tabular-nums}
+button,select{font:inherit;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 14px;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--sea);outline-offset:2px}
+.pri{background:var(--sea);color:#fff;border-color:var(--sea);font-weight:600}
+.danger{color:var(--acc);border-color:var(--acc)}
+.card{background:var(--card);border-radius:18px;padding:16px;margin-bottom:14px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chips{display:flex;gap:8px;flex-wrap:wrap}
+.chip.on{background:var(--sea);color:#fff;border-color:var(--sea)}
+label{font-size:14px;color:var(--mute);display:block;margin:10px 0 4px}
+input[type=number],input[type=text],input[type=url],input[type=datetime-local],textarea{font:inherit;font-size:16px;width:100%;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px}
+textarea{padding:10px 12px;min-height:70px}
+input[type=range]{width:100%;accent-color:var(--sea);min-height:36px}
+.water{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}
+.ring{width:min(180px,44vw);aspect-ratio:1;position:relative;justify-self:center}
+.ring svg{width:100%;height:100%;transform:rotate(-90deg)}
+.ring .v{transition:stroke-dashoffset .5s ease}
+.ring div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
+.ring b{font-size:clamp(28px,8vw,40px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.ring span{font-size:13px;color:var(--mute)}
+.wbtn{display:grid;gap:8px}
+.hint{font-size:14px;color:var(--mute);margin:8px 0 0}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+.tile{min-height:76px;border-radius:16px;border:0;background:var(--card);display:grid;place-content:center;gap:2px;text-align:center;padding:8px;font-weight:600}
+.tile i{display:block;width:26px;height:6px;border-radius:3px;margin:0 auto 6px;background:var(--c,var(--sea))}
+.tile small{font-weight:400;font-size:12px;color:var(--mute)}
+.day{margin:18px 0 6px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:baseline}
+.day b{font-size:17px}.day span{font-size:13px;color:var(--mute)}
+.ent{display:grid;grid-template-columns:8px minmax(0,1fr) auto;gap:10px;align-items:center;width:100%;text-align:left;background:var(--card);border:0;border-radius:12px;padding:10px 12px;margin:6px 0;min-height:56px}
+.ent i{width:8px;height:32px;border-radius:4px;background:var(--c,var(--sea))}
+.ent .t{font-variant-numeric:tabular-nums;text-align:right;font-size:14px;line-height:1.25;white-space:nowrap}
+.ent .t small{display:block;color:var(--mute);font-size:12px}
+.ent .m small{display:block;color:var(--mute);font-size:13px}
+.pend{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--acc);margin-left:6px;vertical-align:middle}
+.sheet{position:fixed;inset:0;background:#0007;display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheet.open{display:flex}
+.sheet>div{background:var(--bg);width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px max(4vw,16px) calc(18px + env(safe-area-inset-bottom))}
+.sheet .acts{display:flex;gap:8px;margin-top:16px}.sheet .acts button{flex:1}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(5,minmax(0,1fr));padding:4px max(2vw,6px) calc(4px + env(safe-area-inset-bottom));z-index:10}
+nav a{color:var(--mute);text-decoration:none;font-size:12px;font-weight:600;text-align:center;padding:8px 0;min-height:52px}
+nav a i{display:block;width:22px;height:4px;border-radius:2px;margin:2px auto 6px;background:currentColor;opacity:.35}
+nav a.on{color:var(--sea)}nav a.on i{opacity:1}
+.toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:30;white-space:nowrap}
+.toast.show{opacity:1}
+.bars .b{display:grid;grid-template-columns:62px minmax(0,1fr) 54px;gap:8px;align-items:center;font-size:14px;margin:4px 0}
+.bars .tr{height:12px;border-radius:6px;background:var(--sea2);overflow:hidden}.bars .tr i{display:block;height:100%;background:var(--sea);border-radius:6px}
+.bars .v{text-align:right;font-variant-numeric:tabular-nums}
+.rec{background:#0a6aa1;color:#fff}.rec .hint{color:#ffffffcc}
+details{border-top:1px solid var(--line);padding:10px 0}details summary{font-weight:600;cursor:pointer;min-height:32px}
+.st{font-size:13px;color:var(--mute);text-align:center;margin:10px 0}
+a{color:var(--sea)}
+@media(max-width:420px){.water{grid-template-columns:1fr}.wbtn{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(prefers-reduced-motion:reduce){.ring .v,.toast{transition:none}}
+</style>
+</head>
+<body>
+<main>
+  <header><h1 id="ttl">Dodaj</h1><div class="now" id="now"></div></header>
+  <div id="view"></div>
+  <p class="st" id="st"></p>
+</main>
+<nav id="nav">
+  <a href="#dodaj" data-r="dodaj"><i></i>Dodaj</a>
+  <a href="#historia" data-r="historia"><i></i>Historia</a>
+  <a href="#zalecenia" data-r="zalecenia"><i></i>Zalecenia</a>
+  <a href="#postep" data-r="postep"><i></i>Postęp</a>
+  <a href="#ustawienia" data-r="ustawienia"><i></i>Ustawienia</a>
+</nav>
+<div class="sheet" id="sheet"><div id="sh"></div></div>
+<div class="toast" id="toast"></div>
+<script>
+{
+/* ---------- Dane i typy ---------- */
+const T={
+ woda:{n:'Woda',u:'ml',c:'#1f8fd0'},posilek:{n:'Posiłek',u:'kcal',c:'#e08a1e'},kawa:{n:'Kawa',u:'szt.',c:'#8a5a3b'},
+ spac:{n:'Idę spać',u:'',c:'#6b5bd6'},pobudka:{n:'Pobudka',u:'/5',c:'#e2b714'},drzemka:{n:'Drzemka',u:'min',c:'#7d8b96'},
+ trening:{n:'Trening',u:'min',c:'#0a7d55'},suple:{n:'Suplementy',u:'',c:'#d0508a'},bol:{n:'Ból',u:'/10',c:'#ff5a3c'},
+ alergia:{n:'Alergia',u:'/3',c:'#f07b2c'},energia:{n:'Energia',u:'/5',c:'#c9a400'},waga:{n:'Waga',u:'kg',c:'#55707f'},alkohol:{n:'Alkohol',u:'ml',c:'#8e3b5c'},notatka:{n:'Notatka',u:'',c:'#9aa7b0'}};
+const CO={trening:['Body by Science','Izometria kolan','Kolana powolne','Kręgosłup','Spacer'],
+ suple:['D3','Magnez','Omega-3','Kreatyna','Kolagen + C','Witamina C'],bol:['Kolano lewe','Kolano prawe','Plecy'],
+ alergia:['Katar','Oczy','Kichanie','Lek przeciwhistaminowy'],alkohol:['Piwo','Wino','Wódka / mocny','Cydr','Inne']};
+const SCALE={pobudka:[1,5],energia:[1,5],alergia:[1,3]};
+const EX=[
+ ['Body by Science','Wyciąg górny','Uda zablokowane, ściągasz drążek do klatki przez 4–5 s, oddajesz przez 4–5 s. Bez szarpania tułowiem. Do upadku, 60–120 s.','https://www.youtube.com/watch?v=3JL9PoZy5G0'],
+ ['Body by Science','Wyciskanie w siadzie','Plecy przy oparciu, łopatki ściągnięte. Wypychasz 4–5 s, wracasz 4–5 s, bez blokowania łokci.','https://www.youtube.com/watch?v=3JL9PoZy5G0'],
+ ['Body by Science','Wiosłowanie w siadzie','Najlepiej z podporą na klatkę. Ciągniesz do brzucha 4–5 s, tułów nieruchomy.','https://www.youtube.com/watch?v=3JL9PoZy5G0'],
+ ['Body by Science','Wyciskanie nad głowę','Tylko maszyna z oparciem. Bez wyginania lędźwi w łuk; gdy się wyginają, kończysz serię.','https://www.youtube.com/watch?v=3JL9PoZy5G0'],
+ ['Body by Science','Leg press','Miednica zostaje na oparciu. Na początek kolana zgięte do 60–70°, bez serii do upadku.','https://www.youtube.com/watch?v=3JL9PoZy5G0'],
+ ['Kolana','Hiszpański przysiad','Taśma za kolanami, siad w tył do 60–90°, piszczele pionowo. 5 × 45 s, 2 min przerwy, ból do 3/10.','https://www.youtube.com/watch?v=-ksofnvkohI'],
+ ['Kolana','Izometria prostowania nóg','Na atlasie zatrzymujesz ruch przy zgięciu ok. 60°, napięcie ok. 70% możliwości. 5 × 45 s.','https://www.youtube.com/watch?v=w4-Cs6vzBX4'],
+ ['Kolana','Powolne powtórzenia','Od 3. tygodnia: 3 s w dół, 3 s w górę, 4 serie, od 15 do 6 powtórzeń. 3 × w tygodniu.','https://www.youtube.com/watch?v=h6bbSX6AYdA'],
+ ['Kręgosłup','Spięcie brzucha McGilla','Jedna noga zgięta, dłonie pod lędźwiami. Unosisz głowę z barkami o kilka cm, 8–10 s, schemat 5-3-1.','https://www.youtube.com/watch?v=FmZwkgg7pqU&t=47s'],
+ ['Kręgosłup','Deska bokiem','Łokieć pod barkiem, biodra w linii. 10 s, stopniowo do 30 s, 3 serie na stronę.','https://www.youtube.com/watch?v=FmZwkgg7pqU&t=203s'],
+ ['Kręgosłup','Pies z ptakiem','Klęk podparty, prostujesz rękę i przeciwną nogę, 8 s, miednica nieruchoma.','https://www.youtube.com/watch?v=FmZwkgg7pqU&t=322s'],
+ ['Kręgosłup','Pallof press','Taśma z boku na wysokości pępka, wypychasz ręce przed siebie i nie dajesz się obrócić. 8–10 na stronę.','https://www.youtube.com/watch?v=lqPrSGXfL1Q']];
+const ls={get(k,d){try{const v=localStorage.getItem('dz_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('dz_'+k,JSON.stringify(v))}catch(e){}}};
+let TH=ls.get('thumbs',{}),E=ls.get('entries',{}),Q=ls.get('queue',[]),R=ls.get('recs',[]),S=Object.assign({url:'',key:'',home:'Europe/Warsaw',cel:3000,vitc:1000},ls.get('settings',{}));
+const $=s=>document.querySelector(s);
+const esc=v=>String(v??'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- Czas i strefy ----------
+   Każdy wpis ma: utc (moment w czasie), tz (strefa telefonu w chwili wpisu), local (godzina lokalna).
+   Dzień wpisu = data lokalna w jego strefie. Gdy strefa różni się od domowej, pokazujemy też czas domowy. */
+const devTz=()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone||'UTC'}catch(e){return 'UTC'}};
+function parts(d,tz){const o={};new Intl.DateTimeFormat('en-GB',{timeZone:tz,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'}).formatToParts(d).forEach(p=>o[p.type]=p.value);return o}
+const localStr=(d,tz)=>{const p=parts(d,tz);return `${p.year}-${p.month}-${p.day} ${p.hour}:${p.minute}`};
+const offMin=(d,tz)=>{const p=parts(d,tz);return Math.round((Date.UTC(+p.year,p.month-1,+p.day,+p.hour,+p.minute,+p.second)-d.getTime())/60000)};
+function fromLocal(str,tz){const [a,b]=str.split('T');const [y,m,dd]=a.split('-').map(Number);const [h,mi]=b.split(':').map(Number);let g=Date.UTC(y,m-1,dd,h,mi);let t=g-offMin(new Date(g),tz)*60000;t=g-offMin(new Date(t),tz)*60000;return new Date(t)}
+const short=tz=>{try{return new Intl.DateTimeFormat('pl-PL',{timeZone:tz,timeZoneName:'short'}).formatToParts(new Date()).find(p=>p.type==='timeZoneName').value}catch(e){return tz}};
+const dayName=s=>new Date(s+'T12:00Z').toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'});
+const todayLocal=()=>localStr(new Date(),devTz()).slice(0,10);
+function mk(typ,f){const tz=devTz(),d=f.when?fromLocal(f.when,tz):new Date();return{id:(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)),utc:d.toISOString(),tz,offset_min:offMin(d,tz),local:localStr(d,tz),typ,ilosc:f.ilosc??null,co:f.co||[],opis:f.opis||'',vitc_mg:f.vitc_mg||null,foto:''}}
+
+/* ---------- Zapis, kolejka, synchronizacja ---------- */
+function persist(){ls.set('entries',E);ls.set('queue',Q)}
+function saveThumbs(){const k=Object.keys(TH);if(k.length>80)k.slice(0,k.length-80).forEach(x=>delete TH[x]);ls.set('thumbs',TH)}
+function push(op){op.qid=Date.now()+'-'+Math.random().toString(36).slice(2,7);Q.push(op);persist();sync()}
+function add(typ,f){const e=mk(typ,f);E[e.id]=e;if(f.thumb){TH[e.id]=f.thumb;saveThumbs()}push({op:'upsert',entry:f.photo?Object.assign({},e,{foto_data:f.photo}):e});toast(T[typ].n+' zapisano'+(navigator.onLine?'':' · wyślę po połączeniu'));render()}
+let syncing=false;
+async function sync(){if(syncing||!S.url||!S.key||!navigator.onLine){status();return}syncing=true;status('Synchronizuję…');
+ try{if(Q.length){let batch=[],size=0;for(const o of Q){const l=JSON.stringify(o).length;if(batch.length&&(size+l>2e6||batch.length>=40))break;batch.push(o);size+=l}const r=await fetch(S.url,{method:'POST',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({key:S.key,ops:batch})}).then(x=>x.json());
+   if(!r.ok)throw new Error(r.error||'błąd');const done=new Set(r.done);Q=Q.filter(o=>!done.has(o.qid));persist();if(Q.length){syncing=false;return sync()}}
+  const u=S.url+(S.url.includes('?')?'&':'?')+'key='+encodeURIComponent(S.key);
+  const [l,z]=await Promise.all([fetch(u+'&action=list&days=120').then(x=>x.json()),fetch(u+'&action=recs').then(x=>x.json())]);
+  if(l.ok){const pend=new Set(Q.map(o=>o.entry?o.entry.id:o.id));const n={};Object.values(E).forEach(e=>{if(pend.has(e.id))n[e.id]=e});l.entries.forEach(e=>{if(!pend.has(e.id))n[e.id]=e});E=n;persist()}
+  if(z.ok){R=z.recs;ls.set('recs',R)}
+  ls.set('last',new Date().toISOString());if(!document.querySelector('.sheet.open'))render()}
+ catch(e){status('Nie udało się połączyć. Wpisy czekają w telefonie.')}
+ syncing=false;status()}
+function status(t){const el=$('#st');if(t){el.textContent=t;return}const last=ls.get('last',null);
+ el.textContent=!S.url?'Tryb lokalny: wpisy są tylko w telefonie. Dodaj adres arkusza w Ustawieniach.':(Q.length?`Do wysłania: ${Q.length} · `:'Wszystko wysłane · ')+(last?'ostatnia synchronizacja '+new Date(last).toLocaleString('pl-PL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'}):'jeszcze bez synchronizacji')}
+let tt;function toast(t){const el=$('#toast');el.textContent=t;el.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),2200)}
+
+/* ---------- Pomocnicze ---------- */
+function shrink(file,max,q){return new Promise((ok,no)=>{const u=URL.createObjectURL(file),img=new Image();img.onload=()=>{const k=Math.min(1,max/Math.max(img.width,img.height)),c=document.createElement('canvas');c.width=Math.round(img.width*k);c.height=Math.round(img.height*k);c.getContext('2d').drawImage(img,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL('image/jpeg',q))};img.onerror=no;img.src=u})}
+const list=()=>Object.values(E).sort((a,b)=>b.utc.localeCompare(a.utc));
+const dayOf=e=>e.local.slice(0,10);
+const sumDay=(typ,day)=>list().filter(e=>e.typ===typ&&dayOf(e)===day).reduce((s,e)=>s+(+e.ilosc||0),0);
+const pending=id=>Q.some(o=>(o.entry?o.entry.id:o.id)===id);
+function val(e){const t=T[e.typ];if(e.ilosc==null||e.ilosc==='')return'';if(e.typ==='woda'&&e.vitc_mg)return e.ilosc+' ml · wit. C '+e.vitc_mg+' mg';const v=String(e.ilosc).replace('.',',');return t.u.startsWith('/')?v+t.u:v+' '+t.u}
+function sleepFor(day){const L=list().slice().reverse();const w=L.find(e=>e.typ==='pobudka'&&dayOf(e)===day);if(!w)return null;const s=L.filter(e=>e.typ==='spac'&&e.utc<w.utc).pop();if(!s)return null;const h=(new Date(w.utc)-new Date(s.utc))/36e5;return h>0&&h<16?h:null}
+
+/* ---------- Ekran: Dodaj ---------- */
+function vDodaj(){const day=todayLocal(),w=sumDay('woda',day),cel=S.cel||3000,p=Math.min(1,w/cel),C=2*Math.PI*52;
+ const tiles=['posilek','kawa','alkohol','spac','pobudka','drzemka','trening','suple','bol','alergia','energia','waga','notatka'];
+ const lastW=list().find(e=>e.typ==='woda'&&dayOf(e)===day);
+ return `<section class="card"><h2>Woda dziś</h2><div class="water"><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--sea2)" stroke-width="12"/><circle class="v" cx="60" cy="60" r="52" fill="none" stroke="${p>=1?'var(--ok)':'var(--sea)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}"/></svg><div><b>${(w/1000).toFixed(2).replace('.',',')}</b><span>z ${(cel/1000).toFixed(1).replace('.',',')} l</span></div></div>
+ <div class="wbtn"><button class="pri" data-w="250">+250 ml</button><button class="pri" data-w="500">+500 ml</button><button class="pri" data-w="500" data-c="1">+500 z wit. C</button><button data-open="woda">Inna ilość</button>${lastW?`<button data-undo="${lastW.id}">Cofnij ${esc(lastW.ilosc)} ml</button>`:''}</div></div>
+ <p class="hint">W locie 200–250 ml co godzinę służby. Kawa i herbata się nie liczą.</p></section>
+ <section><div class="tiles">${tiles.map(k=>`<button class="tile" style="--c:${T[k].c}" data-open="${k}"><i></i>${T[k].n}${k==='kawa'?`<small>dziś ${sumDay('kawa',day)}</small>`:''}</button>`).join('')}</div></section>`}
+
+/* ---------- Arkusz wpisu (nowy lub edycja) ---------- */
+let cur=null;
+function openSheet(typ,entry){const e=entry||{typ,ilosc:null,co:[],opis:''};cur={typ:e.typ,id:entry?entry.id:null,ilosc:e.ilosc,co:[...(e.co||[])],opis:e.opis||'',tz:entry?entry.tz:devTz(),vitc:e.vitc_mg||null,photo:null,thumb:null};
+ const t=T[cur.typ],sc=SCALE[cur.typ],whenVal=entry?entry.local.replace(' ','T'):localStr(new Date(),devTz()).replace(' ','T');
+ let f='';
+ if(cur.typ==='bol')f+=`<label for="f_il">Nasilenie: <b id="f_v">${cur.ilosc??0}</b>/10</label><input id="f_il" type="range" min="0" max="10" value="${cur.ilosc??0}">`;
+ else if(sc)f+=`<label>${cur.typ==='pobudka'?'Jakość snu':cur.typ==='alergia'?'Nasilenie objawów':'Poziom energii'}</label><div class="chips">${Array.from({length:sc[1]-sc[0]+1},(_,i)=>i+sc[0]).map(n=>`<button class="chip ${+cur.ilosc===n?'on':''}" data-sc="${n}">${n}</button>`).join('')}</div>`;
+ else if(t.u&&cur.typ!=='spac')f+=`<label for="f_il">Ilość (${t.u})${cur.typ==='posilek'?', opcjonalnie':''}</label><input id="f_il" type="number" inputmode="decimal" step="any" value="${esc(cur.ilosc)}">`;
+ if(cur.typ==='woda')f+=`<div class="chips" style="margin-top:8px">${[150,250,330,500,750].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div><div class="row" style="margin-top:12px"><button class="chip ${cur.vitc?'on':''}" data-vc="1">Z witaminą C</button><input id="f_vc" type="number" inputmode="numeric" style="width:110px" value="${esc(cur.vitc||S.vitc)}"><span class="hint" style="margin:0">mg</span></div>`;
+ if(cur.typ==='alkohol')f+=`<div class="chips" style="margin-top:8px">${[40,100,150,330,500].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div>`;
+ if(cur.typ==='posilek')f+=`<label>Zdjęcie</label>${(cur.id&&TH[cur.id])?`<img src="${TH[cur.id]}" alt="" style="width:120px;border-radius:12px;display:block;margin-bottom:8px">`:''}<img id="f_prev" alt="" style="width:120px;border-radius:12px;display:none;margin-bottom:8px"><input id="f_ph" type="file" accept="image/*" capture="environment" style="display:none"><button data-ph="1">${cur.id?'Zmień zdjęcie':'Zrób zdjęcie'}</button>`;
+ if(CO[cur.typ])f+=`<label>${cur.typ==='trening'?'Rodzaj':cur.typ==='bol'?'Gdzie boli':cur.typ==='suple'?'Co wziąłeś':cur.typ==='alkohol'?'Rodzaj':'Objawy'}</label><div class="chips">${CO[cur.typ].map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+ f+=`<label for="f_op">${cur.typ==='posilek'?'Co zjadłeś':'Notatka'}${cur.typ==='notatka'||cur.typ==='posilek'?'':' (opcjonalnie)'}</label><textarea id="f_op">${esc(cur.opis)}</textarea>`;
+ f+=`<label for="f_when">Godzina (${esc(short(cur.tz))}${cur.tz!==devTz()?' – strefa z chwili wpisu':''})</label><input id="f_when" type="datetime-local" value="${whenVal}">`;
+ $('#sh').innerHTML=`<h2>${entry?'Edytuj: ':''}${t.n}</h2>${f}<div class="acts">${entry?'<button class="danger" data-del="1">Usuń</button>':''}<button data-close="1">Anuluj</button><button class="pri" data-save="1">Zapisz</button></div>`;
+ $('#sheet').classList.add('open');const il=$('#f_il');if(il&&il.type==='number')setTimeout(()=>il.focus(),50)}
+function closeSheet(){$('#sheet').classList.remove('open');cur=null}
+function saveSheet(){const il=$('#f_il');if(il)cur.ilosc=il.value===''?null:+il.value;if(cur.typ==='woda'){const v=+$('#f_vc').value||S.vitc;if(cur.vitc){cur.vitc=v;S.vitc=v;ls.set('settings',S);if(!cur.co.includes('Witamina C'))cur.co.push('Witamina C')}else cur.co=cur.co.filter(c=>c!=='Witamina C')}cur.opis=$('#f_op').value.trim();const when=$('#f_when').value;
+ if(cur.id){const e=E[cur.id];const d=fromLocal(when,cur.tz);if(cur.thumb){TH[e.id]=cur.thumb;saveThumbs()}Object.assign(e,{vitc_mg:cur.vitc,ilosc:cur.ilosc,co:cur.co,opis:cur.opis,utc:d.toISOString(),local:localStr(d,cur.tz),offset_min:offMin(d,cur.tz)});push({op:'upsert',entry:cur.photo?Object.assign({},e,{foto_data:cur.photo}):e});toast('Zmieniono');closeSheet();render()}
+ else{const nowStr=localStr(new Date(),devTz()).replace(' ','T');const t=cur.typ,f={ilosc:cur.ilosc,co:cur.co,opis:cur.opis,vitc_mg:cur.vitc,photo:cur.photo,thumb:cur.thumb,when:when&&when!==nowStr?when:null};closeSheet();add(t,f)}}
+
+/* ---------- Ekran: Historia ---------- */
+let filt='';
+function vHistoria(){const L=list().filter(e=>!filt||e.typ===filt);const days=[...new Set(L.map(dayOf))];
+ const types=[...new Set(list().map(e=>e.typ))];
+ return `<div class="chips" style="margin-bottom:6px"><button class="chip ${!filt?'on':''}" data-f="">Wszystko</button>${types.map(k=>`<button class="chip ${filt===k?'on':''}" data-f="${k}">${T[k].n}</button>`).join('')}</div>
+ ${days.length?days.map(d=>{const w=sumDay('woda',d),sl=sleepFor(d);return `<div class="day"><b>${dayName(d)}</b><span>${w?'woda '+(w/1000).toFixed(1).replace('.',',')+' l':''}${sl?' · sen '+sl.toFixed(1).replace('.',',')+' h':''}</span></div>`+
+  L.filter(e=>dayOf(e)===d).map(e=>{const away=e.tz!==S.home;const homeT=away?localStr(new Date(e.utc),S.home).slice(11):'';
+   return `<button class="ent" style="--c:${T[e.typ].c}" data-edit="${e.id}"><i></i><span class="m"><b>${T[e.typ].n}</b> ${esc(val(e))}${pending(e.id)?'<span class="pend" title="Czeka na wysłanie"></span>':''}${(e.co&&e.co.length)||e.opis?`<small>${esc([...(e.co||[]).filter(c=>!(e.typ==='woda'&&c==='Witamina C')),e.opis].filter(Boolean).join(' · '))}</small>`:''}${TH[e.id]?`<img src="${TH[e.id]}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-top:6px;display:block">`:e.foto?'<small>ze zdjęciem</small>':''}</span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${away?`<small>dom ${homeT}</small>`:''}</span></button>`}).join('')}).join('')
+ :'<section class="card"><p style="margin:0">Brak wpisów. Dodaj pierwszy na ekranie Dodaj.</p></section>'}`}
+
+/* ---------- Ekran: Zalecenia ---------- */
+function vZal(){const d=todayLocal();const dz=R.filter(r=>r.data===d),og=R.filter(r=>!r.data||r.data==='ogólne'),nx=R.filter(r=>r.data>d).sort((a,b)=>a.data.localeCompare(b.data)).slice(0,10);
+ const grp=[...new Set(EX.map(x=>x[0]))];
+ return `${dz.length?dz.map(r=>`<section class="card rec"><h2>Dziś: ${esc(r.tytul)}</h2><p style="margin:0">${esc(r.tekst)}</p></section>`).join(''):''}
+ ${og.map(r=>`<section class="card"><h2>${esc(r.tytul)}</h2><p style="margin:0">${esc(r.tekst)}</p></section>`).join('')}
+ ${nx.length?`<section class="card"><h2>Kolejne dni</h2>${nx.map(r=>`<p style="margin:6px 0"><b>${dayName(r.data)}:</b> ${esc(r.tekst)}</p>`).join('')}</section>`:''}
+ ${!R.length?'<section class="card"><p style="margin:0">Zalecenia pojawią się po pierwszej synchronizacji z arkuszem.</p></section>':''}
+ <section class="card"><h2>Ćwiczenia</h2>${grp.map(g=>`<p class="hint" style="margin:12px 0 0"><b>${g}</b></p>${EX.filter(x=>x[0]===g).map(x=>`<details><summary>${x[1]}</summary><p style="margin:6px 0">${x[2]}</p><a href="${x[3]}" target="_blank" rel="noopener">Film (wymaga internetu)</a></details>`).join('')}`).join('')}</section>`}
+
+/* ---------- Ekran: Postęp ---------- */
+function vPostep(){const ds=[...Array(14)].map((_,i)=>{const d=new Date(Date.now()-(13-i)*864e5);return localStr(d,devTz()).slice(0,10)});const cel=S.cel||3000;
+ const lastOf=(typ,d)=>{const x=list().find(e=>e.typ===typ&&dayOf(e)===d);return x?+x.ilosc:null};
+ const bar=(d,v,max,lbl,warn)=>`<div class="b"><span>${dayName(d).replace(/^\S+\s/,'')}</span><div class="tr"><i style="width:${Math.min(100,(v||0)/max*100)}%;${warn?'background:var(--acc)':''}"></i></div><span class="v">${lbl}</span></div>`;
+ const pain=d=>{const x=list().filter(e=>e.typ==='bol'&&dayOf(e)===d);return x.length?Math.max(...x.map(e=>+e.ilosc||0)):null};
+ return `<section class="card"><h2>Woda (cel ${(cel/1000).toFixed(1).replace('.',',')} l)</h2><div class="bars">${ds.map(d=>{const w=sumDay('woda',d);return bar(d,w,cel,w?(w/1000).toFixed(1).replace('.',','):'–',w&&w<cel*.6)}).join('')}</div></section>
+ <section class="card"><h2>Sen</h2><div class="bars">${ds.map(d=>{const s=sleepFor(d);return bar(d,s,9,s?s.toFixed(1).replace('.',',')+' h':'–',s&&s<6)}).join('')}</div></section>
+ <section class="card"><h2>Ból (najwyższy w dniu)</h2><div class="bars">${ds.map(d=>{const p=pain(d);return bar(d,p,10,p==null?'–':p+'/10',p>3)}).join('')}</div></section>
+ <section class="card"><h2>Waga</h2><div class="bars">${ds.map(d=>{const w=lastOf('waga',d);return bar(d,w?w-80:0,15,w?String(w).replace('.',',')+' kg':'–')}).join('')}</div><p class="hint">Pasek od 80 do 95 kg. Cel ok. 87 kg.</p></section>`}
+
+/* ---------- Ekran: Ustawienia ---------- */
+function vUst(){return `<section class="card"><h2>Połączenie z arkuszem</h2><label for="s_url">Adres skryptu (Apps Script)</label><input id="s_url" type="url" value="${esc(S.url)}" placeholder="https://script.google.com/macros/s/…/exec"><label for="s_key">Tajny klucz</label><input id="s_key" type="text" value="${esc(S.key)}" autocomplete="off"><div class="row" style="margin-top:12px"><button class="pri" data-ss="1">Zapisz i synchronizuj</button></div></section>
+ <section class="card"><h2>Strefa domowa i cele</h2><label for="s_home">Strefa domowa</label><input id="s_home" type="text" value="${esc(S.home)}"><p class="hint">Telefon jest teraz w strefie ${esc(devTz())} (${esc(short(devTz()))}). Każdy wpis zapisuje swoją strefę, więc godziny z postojów się nie mieszają.</p><label for="s_cel">Cel wody (ml)</label><input id="s_cel" type="number" value="${esc(S.cel)}"><label for="s_vc">Witamina C w wodzie, domyślna dawka (mg)</label><input id="s_vc" type="number" value="${esc(S.vitc)}"><p class="hint">Mieszanka askorbinianu sodu z kwasem askorbinowym. Przycisk „+500 z wit. C” zapisuje tę dawkę.</p></section>
+ <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
+
+/* ---------- Render i zdarzenia ---------- */
+const TT={dodaj:'Dodaj',historia:'Historia',zalecenia:'Zalecenia',postep:'Postęp',ustawienia:'Ustawienia'};
+const route=()=>{const h=location.hash.slice(1);return TT[h]?h:'dodaj'};
+function clock(){const tz=devTz(),n=new Date();$('#now').innerHTML=`<b>${localStr(n,tz).slice(11)}</b> ${esc(short(tz))}<br>${n.toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short',timeZone:tz})}${tz!==S.home?` · dom ${localStr(n,S.home).slice(11)}`:''}`}
+function render(){const r=route();$('#ttl').textContent=TT[r];document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.r===r));
+ $('#view').innerHTML={dodaj:vDodaj,historia:vHistoria,zalecenia:vZal,postep:vPostep,ustawienia:vUst}[r]();clock();status()}
+addEventListener('hashchange',()=>{render();scrollTo(0,0)});
+$('#view').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.w)add('woda',{ilosc:+d.w,vitc_mg:d.c?S.vitc:null,co:d.c?['Witamina C']:[]});
+ else if(d.undo){const x=E[d.undo];delete E[d.undo];push({op:'delete',id:x.id});toast('Cofnięto');render()}
+ else if(d.open)openSheet(d.open);
+ else if(d.edit)openSheet(null,E[d.edit]);
+ else if(d.f!==undefined){filt=d.f;render()}
+ else if(d.ss){S.url=$('#s_url').value.trim();S.key=$('#s_key').value.trim();S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S);toast('Zapisano ustawienia');sync()}});
+$('#view').addEventListener('change',e=>{if(['s_home','s_cel','s_vc'].includes(e.target.id)){S.home=$('#s_home').value.trim()||'Europe/Warsaw';S.cel=+$('#s_cel').value||3000;S.vitc=+$('#s_vc').value||1000;ls.set('settings',S)}});
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();return}const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.close)closeSheet();else if(d.save)saveSheet();
+ else if(d.del){const x=E[cur.id];delete E[cur.id];push({op:'delete',id:x.id});closeSheet();toast('Usunięto');render()}
+ else if(d.sc){cur.ilosc=+d.sc;b.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b))}
+ else if(d.q){$('#f_il').value=d.q}
+ else if(d.vc){cur.vitc=cur.vitc?null:(+$('#f_vc').value||S.vitc);b.classList.toggle('on')}
+ else if(d.ph){$('#f_ph').click()}
+ else if(d.co){const i=cur.co.indexOf(d.co);i<0?cur.co.push(d.co):cur.co.splice(i,1);b.classList.toggle('on')}});
+$('#sheet').addEventListener('change',async e=>{if(e.target.id!=='f_ph'||!e.target.files[0])return;try{const f=e.target.files[0];cur.photo=await shrink(f,1024,.72);cur.thumb=await shrink(f,240,.6);const p=$('#f_prev');p.src=cur.thumb;p.style.display='block'}catch(x){toast('Nie udało się wczytać zdjęcia')}});
+$('#sheet').addEventListener('input',e=>{if(e.target.id==='f_il'&&e.target.type==='range')$('#f_v').textContent=e.target.value});
+addEventListener('online',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden){render();sync()}});
+setInterval(clock,30000);setInterval(()=>{if(Q.length)sync()},60000);
+render();sync();
+if('serviceWorker' in navigator&&location.protocol==='https:'){try{navigator.serviceWorker.register('sw.js').catch(()=>{})}catch(e){}}
+}
+</script>
+</body>
+</html>

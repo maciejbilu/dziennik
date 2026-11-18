@@ -1,0 +1,13 @@
+{
+  "name": "Mój dziennik",
+  "short_name": "Dziennik",
+  "start_url": "./#dodaj",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0a6aa1",
+  "lang": "pl",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}
