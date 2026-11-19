@@ -75,6 +75,13 @@ nav a.on{color:var(--sea)}nav a.on i{opacity:1}
 .rec{background:var(--rec);color:#fff7ef}.rec .hint{color:#fff7efcc}
 details{border-top:1px solid var(--line);padding:10px 0}details summary{font-weight:600;cursor:pointer;min-height:32px}
 .mus{flex:none;display:block}
+.timebtn{width:100%;text-align:left;font-weight:600}
+.dialov{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:40}.dialov.open{display:flex}
+.dialbox{background:var(--bg);border-radius:20px;padding:16px;width:min(340px,92vw)}
+.dialhead{display:flex;align-items:center;justify-content:space-between;gap:8px}.dialhead b{font-size:16px}
+.dialtime{display:flex;justify-content:center;align-items:center;gap:4px;margin:10px 0;font-size:34px;font-weight:800}
+.dialtime button{font-size:34px;font-weight:800;min-height:52px;border:0;background:none;color:var(--mute);padding:0 6px}.dialtime button.on{color:var(--sea)}
+#dsvg{width:100%;display:block;touch-action:none}.dialbox .acts{display:flex;gap:8px;margin-top:12px}.dialbox .acts button{flex:1}
 .set{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;background:var(--card);border-radius:14px;padding:10px;margin:8px 0}
 .set small{display:block;color:var(--mute);font-size:12px;margin:4px 0}
 .set .g3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;margin-top:6px}
@@ -105,6 +112,7 @@ a{color:var(--sea)}.btnlink{display:inline-flex;align-items:center;min-height:44
 </nav>
 <div class="sheet" id="sheet"><div id="sh"></div></div>
 <div class="toast" id="toast"></div>
+<div class="dialov" id="dialov"><div class="dialbox"><div class="dialhead"><button data-dd="-1" aria-label="Poprzedni dzień">‹</button><b id="dDate"></b><button data-dd="1" aria-label="Następny dzień">›</button></div><div class="dialtime"><button id="dH" data-dm="h"></button><span>:</span><button id="dM" data-dm="m"></button></div><svg id="dsvg" viewBox="0 0 240 240"></svg><div class="acts"><button data-dx="now">Teraz</button><button data-dx="cancel">Anuluj</button><button class="pri" data-dx="ok">OK</button></div></div></div>
 <input id="pdfIn" type="file" accept="application/pdf,.pdf" style="display:none">
 <script>
 {
@@ -118,8 +126,16 @@ const NIGHT={woda:'#e07b39',posilek:'#d9a441',kawa:'#a0522d',spac:'#c0504d',pobu
 const DARK=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):{matches:false};
 const col=k=>DARK.matches&&NIGHT[k]?NIGHT[k]:T[k].c;
 const CO={trening:['Body by Science','Izometria kolan','Kolana powolne','Kręgosłup','Spacer'],
- suple:['D3','Magnez','Omega-3','Kreatyna','Kolagen + C','Witamina C'],bol:['Kolano lewe','Kolano prawe','Plecy'],
+ suple:[],bol:['Kolano lewe','Kolano prawe','Plecy'],
  alergia:['Katar','Oczy','Kichanie','Lek przeciwhistaminowy'],alkohol:['Piwo','Wino','Wódka / mocny','Cydr','Inne'],kawa:['Czarna','Z mlekiem'],napoj:['Cola','Cola zero','Woda kokosowa','Sok','Napój izotoniczny','Herbata','Inny']};
+const SUPG=[['Witaminy',['Witamina C','D3','K2 MK-7','Witamina A','Witamina E','B-kompleks','B12','Niacyna (B3)']],
+ ['Minerały',['Magnez','Potas','Cynk','Selen','Jod (płyn Lugola)','Bor','Krzem','Wapń','Żelazo','Elektrolity']],
+ ['Aminokwasy i białko',['Kolagen','Lizyna','Prolina','Glicyna','NAC','Kreatyna','Tauryna','L-karnityna']],
+ ['Inne',['Omega-3','Koenzym Q10','MSM','Kwas alfa-liponowy','Berberyna','Ostropest','Kurkumina','Czarnuszka (olej)','Astaksantyna','Chlorella','Probiotyk','Melatonina','Ashwagandha']]];
+const DOSE={'Witamina C':['mg',[500,1000,2000,3000,5000],1000],D3:['j.m.',[1000,2000,4000,5000,10000],2000],'K2 MK-7':['µg',[100,200],100],'Witamina A':['j.m.',[5000,10000,25000],10000],'Witamina E':['j.m.',[200,400],400],'B-kompleks':['kaps.',[1,2],1],B12:['µg',[500,1000],1000],'Niacyna (B3)':['mg',[50,100,500],100],
+ Magnez:['mg',[200,300,400,600],400],Potas:['mg',[200,500,1000],500],Cynk:['mg',[10,15,25,50],15],Selen:['µg',[100,200],100],'Jod (płyn Lugola)':['mg',[1,3,6,12.5,25],6],Bor:['mg',[3,6],3],Krzem:['mg',[10,25,50],25],'Wapń':['mg',[250,500],500],'Żelazo':['mg',[14,28,50],28],Elektrolity:['porcja',[1,2],1],
+ Kolagen:['g',[5,10,15,20],15],Lizyna:['mg',[500,1000,2000,3000],1000],Prolina:['mg',[500,1000,2000],1000],Glicyna:['g',[3,5,10],3],NAC:['mg',[600,1200],600],Kreatyna:['g',[3,5],5],Tauryna:['mg',[500,1000,2000],1000],'L-karnityna':['mg',[500,1000,2000],1000],
+ 'Omega-3':['mg EPA+DHA',[1000,2000,3000],2000],'Koenzym Q10':['mg',[100,200,300],100],MSM:['g',[1,2,3,5],2],'Kwas alfa-liponowy':['mg',[300,600],300],Berberyna:['mg',[500,1000,1500],500],Ostropest:['mg',[150,300,600],300],Kurkumina:['mg',[500,1000],500],'Czarnuszka (olej)':['ml',[5,10],5],Astaksantyna:['mg',[4,8,12],8],Chlorella:['g',[1,3,5],3],Probiotyk:['kaps.',[1,2],1],Melatonina:['mg',[0.5,1,3,5],1],Ashwagandha:['mg',[300,600],300]};
 const SINGLE={kawa:1,napoj:1};
 const SCALE={pobudka:[1,5],energia:[1,5],alergia:[1,3]};
 const EX=[
@@ -273,7 +289,8 @@ function fromLocal(str,tz){const [a,b]=str.split('T');const [y,m,dd]=a.split('-'
 const short=tz=>{try{return new Intl.DateTimeFormat('pl-PL',{timeZone:tz,timeZoneName:'short'}).formatToParts(new Date()).find(p=>p.type==='timeZoneName').value}catch(e){return tz}};
 const dayName=s=>new Date(s+'T12:00Z').toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short',timeZone:'UTC'});
 const todayLocal=()=>localStr(new Date(),devTz()).slice(0,10);
-function mk(typ,f){const tz=devTz(),d=f.when?fromLocal(f.when,tz):new Date();return{id:(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)),utc:d.toISOString(),tz,offset_min:offMin(d,tz),local:localStr(d,tz),typ,ilosc:f.ilosc??null,co:f.co||[],opis:f.opis||'',vitc_mg:f.vitc_mg||null,foto:'',sets:f.sets||[]}}
+const rnd5=d=>new Date(Math.round(d.getTime()/3e5)*3e5);
+function mk(typ,f){const tz=devTz(),d=f.when?fromLocal(f.when,tz):rnd5(new Date());return{id:(crypto.randomUUID?crypto.randomUUID():Date.now()+'-'+Math.random().toString(36).slice(2)),utc:d.toISOString(),tz,offset_min:offMin(d,tz),local:localStr(d,tz),typ,ilosc:f.ilosc??null,co:f.co||[],opis:f.opis||'',vitc_mg:f.vitc_mg||null,foto:'',sets:f.sets||[],kcal:f.kcal??null,dawki:f.dawki||null}}
 
 /* ---------- Zapis, kolejka, synchronizacja ---------- */
 function persist(){ls.set('entries',E);ls.set('queue',Q)}
@@ -301,12 +318,14 @@ const list=()=>Object.values(E).sort((a,b)=>b.utc.localeCompare(a.utc));
 const dayOf=e=>e.local.slice(0,10);
 const sumDay=(typ,day)=>list().filter(e=>e.typ===typ&&dayOf(e)===day).reduce((s,e)=>s+(+e.ilosc||0),0);
 const pending=id=>Q.some(o=>(o.entry?o.entry.id:o.id)===id);
-function val(e){const t=T[e.typ];if(e.ilosc==null||e.ilosc==='')return'';if(e.typ==='woda'&&e.vitc_mg)return e.ilosc+' ml · wit. C '+e.vitc_mg+' mg';const v=String(e.ilosc).replace('.',',');return t.u.startsWith('/')?v+t.u:v+' '+t.u}
+function val(e){const t=T[e.typ];if(e.typ==='notatka'&&e.kcal)return e.kcal+' kcal';if(e.typ==='suple'&&e.dawki)return'';if(e.ilosc==null||e.ilosc==='')return'';if(e.typ==='woda'&&e.vitc_mg)return e.ilosc+' ml · wit. C '+e.vitc_mg+' mg';if(KCAL[e.typ]){const k=kcalOf(e);return e.ilosc+' ml'+(k!=null?' · ~'+k+' kcal':'')}const v=String(e.ilosc).replace('.',',');return t.u.startsWith('/')?v+t.u:v+' '+t.u}
 function sleepFor(day){const L=list().slice().reverse();const w=L.find(e=>e.typ==='pobudka'&&dayOf(e)===day);if(!w)return null;const s=L.filter(e=>e.typ==='spac'&&e.utc<w.utc).pop();if(!s)return null;const h=(new Date(w.utc)-new Date(s.utc))/36e5;return h>0&&h<16?h:null}
 
 /* ---------- Ekran: Dodaj ---------- */
 const KCAL={napoj:{'Cola':0.42,'Cola zero':0,'Woda kokosowa':0.19,'Sok':0.45,'Napój izotoniczny':0.25,'Herbata':0,'Inny':0.3},alkohol:{'Piwo':0.43,'Wino':0.83,'Wódka / mocny':2.31,'Cydr':0.5,'Inne':0.8},kawa:{'Czarna':0.02,'Z mlekiem':0.35}};
-function kcalDay(day){let k=0,miss=0;list().filter(e=>dayOf(e)===day).forEach(e=>{if(e.typ==='posilek'){if(e.ilosc)k+=+e.ilosc;else miss++}else if(KCAL[e.typ]&&e.ilosc){const f=KCAL[e.typ][(e.co||[])[0]];k+=(f??(e.typ==='kawa'?0.1:0.3))*e.ilosc}});return{k:Math.round(k),miss}}
+function estKcal(typ,co,ml){if(!KCAL[typ]||!ml)return null;const f=KCAL[typ][(co||[])[0]];return Math.round((f??(typ==='kawa'?0.1:0.3))*ml)}
+const kcalOf=e=>e.kcal!=null&&e.kcal!==''?+e.kcal:e.typ==='posilek'?(e.ilosc?+e.ilosc:null):estKcal(e.typ,e.co,+e.ilosc);
+function kcalDay(day){let k=0,miss=0;list().filter(e=>dayOf(e)===day).forEach(e=>{const v=kcalOf(e);if(v!=null)k+=v;else if(e.typ==='posilek')miss++});return{k:Math.round(k),miss}}
 function ringSvg(p,big,sub,cap,over){const C=2*Math.PI*52;return `<div class="rc"><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--sea2)" stroke-width="12"/><circle class="v" cx="60" cy="60" r="52" fill="none" stroke="${over?'var(--acc)':p>=1?'var(--ok)':'var(--sea)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-Math.min(1,p))}"/></svg><div><b>${big}</b><span>${sub}</span></div></div><span class="cap">${cap}</span></div>`}
 function vDodaj(){const day=todayLocal(),w=sumDay('woda',day),cel=S.cel||3000,p=Math.min(1,w/cel),C=2*Math.PI*52;
  const tiles=['posilek','kawa','napoj','alkohol','spac','pobudka','drzemka','trening','suple','bol','alergia','energia','waga','notatka'];
@@ -319,31 +338,44 @@ function vDodaj(){const day=todayLocal(),w=sumDay('woda',day),cel=S.cel||3000,p=
 
 /* ---------- Arkusz wpisu (nowy lub edycja) ---------- */
 let cur=null;
-function openSheet(typ,entry){const e=entry||{typ,ilosc:null,co:[],opis:''};cur={typ:e.typ,id:entry?entry.id:null,ilosc:e.ilosc,co:[...(e.co||[])],opis:e.opis||'',tz:entry?entry.tz:devTz(),vitc:entry?(e.vitc_mg||null):(e.typ==='woda'&&S.vcOn?S.vitc:null),photo:null,thumb:null,sets:(e.sets||[]).map(x=>({...x}))};
- const t=T[cur.typ],sc=SCALE[cur.typ],whenVal=entry?entry.local.replace(' ','T'):localStr(new Date(),devTz()).replace(' ','T');
+function openSheet(typ,entry){const e=entry||{typ,ilosc:null,co:[],opis:''};cur={typ:e.typ,id:entry?entry.id:null,ilosc:e.ilosc,co:[...(e.co||[])],opis:e.opis||'',tz:entry?entry.tz:devTz(),vitc:entry?(e.vitc_mg||null):(e.typ==='woda'&&S.vcOn?S.vitc:null),photo:null,thumb:null,sets:(e.sets||[]).map(x=>({...x})),kcal:e.kcal??null,kcalEd:e.kcal!=null,dawki:{...(e.dawki||{})}};
+ const t=T[cur.typ],sc=SCALE[cur.typ],whenVal=entry?entry.local.replace(' ','T'):localStr(rnd5(new Date()),devTz()).replace(' ','T');
  let f='';
  if(cur.typ==='bol')f+=`<label for="f_il">Nasilenie: <b id="f_v">${cur.ilosc??0}</b>/10</label><input id="f_il" type="range" min="0" max="10" value="${cur.ilosc??0}">`;
  else if(sc)f+=`${cur.typ==='pobudka'?`<p class="hint">Oceń 15–30 minut po wstaniu, biorąc pod uwagę trzy rzeczy: jak szybko zasnąłeś, ile razy się budziłeś i czy czujesz się wypoczęty.<br><b>1</b> – długo zasypiałeś, częste wybudzenia, wstajesz zmęczony<br><b>2</b> – słabo, kilka wybudzeń, ciężki poranek<br><b>3</b> – przeciętnie, da się funkcjonować<br><b>4</b> – dobrze, 1–2 krótkie wybudzenia, wypoczęty<br><b>5</b> – świetnie, szybko zasnąłeś, spałeś ciągiem, pełna energia</p>`:''}<label>${cur.typ==='pobudka'?'Jakość snu':cur.typ==='alergia'?'Nasilenie objawów':'Poziom energii'}</label><div class="chips">${Array.from({length:sc[1]-sc[0]+1},(_,i)=>i+sc[0]).map(n=>`<button class="chip ${+cur.ilosc===n?'on':''}" data-sc="${n}">${n}</button>`).join('')}</div>`;
- else if(t.u&&cur.typ!=='spac')f+=`<label for="f_il">${cur.typ==='trening'?'Czas treningu lub spaceru (min)':`Ilość (${t.u})`}${cur.typ==='posilek'?', opcjonalnie':''}</label><input id="f_il" type="number" inputmode="decimal" step="any" value="${esc(cur.ilosc)}">`;
+ else if(t.u&&cur.typ!=='spac')f+=`<label for="f_il">${cur.typ==='trening'?'Czas treningu lub spaceru (min)':cur.typ==='posilek'?'Kalorie (kcal)':`Ilość (${t.u})`}${cur.typ==='posilek'?' – wpisz albo zostaw, Claude oszacuje':''}</label><input id="f_il" type="number" inputmode="decimal" step="any" value="${esc(cur.ilosc)}">`;
  if(cur.typ==='woda')f+=`<div class="chips" style="margin-top:8px">${[150,250,330,500,750].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div><div class="row" style="margin-top:12px"><button class="chip ${cur.vitc?'on':''}" data-vc="1">Z witaminą C</button><input id="f_vc" type="number" inputmode="numeric" style="width:110px" value="${esc(cur.vitc||S.vitc)}"><span class="hint" style="margin:0">mg</span></div>`;
  if(cur.typ==='napoj')f+=`<div class="chips" style="margin-top:8px">${[200,250,330,500].map(n=>`<button class="chip" data-q="${n}">${n} ml</button>`).join('')}</div>`;
  if(cur.typ==='kawa')f+=`<div class="chips" style="margin-top:8px">${[50,100,250,400].map(n=>`<button class="chip" data-q="${n}">${n} ml</button>`).join('')}</div>`;
  if(cur.typ==='alkohol')f+=`<div class="chips" style="margin-top:8px">${[40,100,150,330,500].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div>`;
  if(cur.typ==='posilek')f+=`<label>Zdjęcie</label>${(cur.id&&TH[cur.id])?`<img src="${TH[cur.id]}" alt="" style="width:120px;border-radius:12px;display:block;margin-bottom:8px">`:''}<img id="f_prev" alt="" style="width:120px;border-radius:12px;display:none;margin-bottom:8px"><input id="f_ph" type="file" accept="image/*" capture="environment" style="display:none"><input id="f_ph2" type="file" accept="image/*" style="display:none"><div class="row"><button data-ph="f_ph">${cur.id?'Nowe zdjęcie':'Zrób zdjęcie'}</button><button data-ph="f_ph2">Z galerii</button></div>`;
- if(CO[cur.typ])f+=`<label>${cur.typ==='trening'?'Rodzaj':cur.typ==='bol'?'Gdzie boli':cur.typ==='suple'?'Co wziąłeś':cur.typ==='alkohol'?'Rodzaj':cur.typ==='kawa'?'Rodzaj kawy':cur.typ==='napoj'?'Rodzaj napoju':'Objawy'}</label><div class="chips">${CO[cur.typ].map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+ if(cur.typ==='suple')f+=`<label>Co wziąłeś</label>${SUPG.map(([g,l])=>`<p class="hint" style="margin:8px 0 4px"><b>${g}</b></p><div class="chips">${l.map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`).join('')}<div id="doses">${dosesHtml()}</div><p class="hint">Melatonina, ashwagandha i berberyna – tylko po uzgodnieniu z lekarzem orzecznikiem (AME).</p>`;
+ else if(CO[cur.typ])f+=`<label>${cur.typ==='trening'?'Rodzaj':cur.typ==='bol'?'Gdzie boli':cur.typ==='suple'?'Co wziąłeś':cur.typ==='alkohol'?'Rodzaj':cur.typ==='kawa'?'Rodzaj kawy':cur.typ==='napoj'?'Rodzaj napoju':'Objawy'}</label><div class="chips">${CO[cur.typ].map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+ if(KCAL[cur.typ]||cur.typ==='notatka')f+=`<label for="f_kc">Kalorie (kcal)${KCAL[cur.typ]?' – liczone z rodzaju i ilości, możesz poprawić':''}</label><input id="f_kc" type="number" inputmode="numeric" value="${esc(cur.kcal??(KCAL[cur.typ]?estKcal(cur.typ,cur.co,+cur.ilosc)??'':''))}">`;
  if(cur.typ==='trening')f+=`<div id="bbs" style="display:${cur.co.includes('Body by Science')?'block':'none'}"><label>Ćwiczenia Body by Science</label><div id="sets">${setsHtml()}</div><button data-addex="1" style="width:100%;margin-top:4px">+ Dodaj ćwiczenie</button><div id="picker"></div></div>`;
  f+=`<label for="f_op">${cur.typ==='posilek'?'Co zjadłeś':'Notatka'}${cur.typ==='notatka'||cur.typ==='posilek'?'':' (opcjonalnie)'}</label><textarea id="f_op">${esc(cur.opis)}</textarea>`;
- f+=`<label for="f_when">Godzina (${sfx(cur.tz)==='C'?'C – czas WAW':sfx(cur.tz)==='Z'?'Z – UTC':'L – czas lokalny'}${cur.tz!==devTz()?', strefa z chwili wpisu':''})</label><input id="f_when" type="datetime-local" value="${whenVal}">`;
+ f+=`<label for="f_when">Godzina (${sfx(cur.tz)==='C'?'C – czas WAW':sfx(cur.tz)==='Z'?'Z – UTC':'L – czas lokalny'}${cur.tz!==devTz()?', strefa z chwili wpisu':''})</label><input id="f_when" type="hidden" value="${whenVal}"><button class="timebtn" data-pick="1" id="f_whenBtn">${fmtWhen(whenVal)}</button>`;
  $('#sh').innerHTML=`<h2>${entry?'Edytuj: ':''}${t.n}</h2>${f}<div class="acts">${entry?'<button class="danger" data-del="1">Usuń</button>':''}<button data-close="1">Anuluj</button><button class="pri" data-save="1">Zapisz</button></div>`;
  $('#sheet').classList.add('open');const il=$('#f_il');if(il&&il.type==='number')setTimeout(()=>il.focus(),50)}
 function lastSet(ex){for(const e of list()){if(e.typ!=='trening'||e.id===cur.id||!e.sets)continue;const x=e.sets.find(s=>s.ex===ex&&(s.kg||s.reps||s.tul));if(x)return x}return null}
 function setsHtml(){return cur.sets.map((x,i)=>{const m=MUS[x.ex]||[x.ex,'',[]],l=lastSet(x.ex);return `<div class="set">${body(m[2],48)}<div><b>${esc(m[0])}</b><div class="g3"><input type="number" inputmode="decimal" step="any" placeholder="kg" aria-label="Obciążenie kg" value="${esc(x.kg)}" data-si="${i}" data-sf="kg"><input type="number" inputmode="numeric" placeholder="powt." aria-label="Powtórzenia" value="${esc(x.reps)}" data-si="${i}" data-sf="reps"><input type="number" inputmode="numeric" placeholder="sek." aria-label="Czas do załamania w sekundach" value="${esc(x.tul)}" data-si="${i}" data-sf="tul" id="tul${i}"></div><small>${l?`Ostatnio: ${l.kg??'–'} kg · ${l.reps??'–'} powt. · ${l.tul??'–'} s`:'Pierwszy raz'}</small><div class="row"><button data-swi="${i}">${sw&&sw.i===i?'Stop':'Stoper'}</button><button data-rm="${i}">Usuń</button></div></div></div>`}).join('')}
 function pickerHtml(){const gr=[...new Set(Object.values(MUS).map(m=>m[1]))];return gr.map(g=>`<p class="hint" style="margin:12px 0 0"><b>${g}</b></p><div class="ptiles">${Object.entries(MUS).filter(([,m])=>m[1]===g).map(([k,m])=>`<button data-ex="${k}">${body(m[2],40)}<span>${esc(m[0])}</span></button>`).join('')}</div>`).join('')}
 let sw=null;
+function doseDef(c){const D=DOSE[c];const v=(S.lastDose&&S.lastDose[c])||(D?D[2]+' '+D[0]:'');return v}
+function dosesHtml(){if(cur.typ!=='suple'||!cur.co.length)return'';return `<label>Dawki</label>`+cur.co.map(c=>{const D=DOSE[c]||['',[],''];const v=cur.dawki[c]||doseDef(c);return `<div style="margin:6px 0"><b style="font-size:14px">${esc(c)}</b> <span class="hint">${esc(v)}</span><div class="chips" style="margin-top:4px">${D[1].map(n=>`<button class="chip ${v===n+' '+D[0]?'on':''}" data-ds="${esc(c)}" data-dv="${esc(n+' '+D[0])}">${String(n).replace('.',',')} ${esc(D[0])}</button>`).join('')}</div></div>`}).join('')}
+function fmtWhen(v){const d=v.slice(0,10),t=v.slice(11,16);return dayName(d)+' · '+t+' ✎'}
+let DL=null;
+function openDial(v){DL={date:v.slice(0,10),h:+v.slice(11,13),m:+v.slice(14,16),mode:'h'};drawDial();$('#dialov').classList.add('open')}
+function drawDial(){const p=n=>String(n).padStart(2,'0');$('#dDate').textContent=dayName(DL.date);$('#dH').textContent=p(DL.h);$('#dM').textContent=p(DL.m);$('#dH').classList.toggle('on',DL.mode==='h');$('#dM').classList.toggle('on',DL.mode==='m');
+ const item=(v,r,a,sel,lbl)=>{const x=120+r*Math.sin(a),y=120-r*Math.cos(a);return `<g data-v="${v}" style="cursor:pointer"><circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="16" fill="${sel?'var(--sea)':'transparent'}"/><text x="${x.toFixed(1)}" y="${(y+5).toFixed(1)}" text-anchor="middle" font-size="${r<80?13:15}" fill="${sel?'var(--onacc)':'var(--ink)'}" font-weight="${sel?700:500}">${lbl}</text></g>`};
+ let g=`<circle cx="120" cy="120" r="112" fill="var(--card)"/>`;
+ if(DL.mode==='h'){const a=(DL.h%12)*Math.PI/6,rr=DL.h<12?92:60;g+=`<line x1="120" y1="120" x2="${120+rr*Math.sin(a)}" y2="${120-rr*Math.cos(a)}" stroke="var(--sea)" stroke-width="2"/>`;for(let h=0;h<24;h++)g+=item(h,h<12?92:60,(h%12)*Math.PI/6,h===DL.h,p(h))}
+ else{const a=DL.m*Math.PI/30;g+=`<line x1="120" y1="120" x2="${120+92*Math.sin(a)}" y2="${120-92*Math.cos(a)}" stroke="var(--sea)" stroke-width="2"/>`;for(let m=0;m<60;m+=5)g+=item(m,92,m*Math.PI/30,m===DL.m,p(m))}
+ $('#dsvg').innerHTML=g+`<circle cx="120" cy="120" r="3" fill="var(--sea)"/>`}
 function closeSheet(){if(sw){clearInterval(sw.h);sw=null}$('#sheet').classList.remove('open');cur=null}
-function saveSheet(){const il=$('#f_il');if(il)cur.ilosc=il.value===''?null:+il.value;if(cur.typ==='woda'){const v=+$('#f_vc').value||S.vitc;if(cur.vitc){cur.vitc=v;S.vitc=v;ls.set('settings',S);if(!cur.co.includes('Witamina C'))cur.co.push('Witamina C')}else cur.co=cur.co.filter(c=>c!=='Witamina C')}cur.opis=$('#f_op').value.trim();const when=$('#f_when').value;if(sw){clearInterval(sw.h);sw=null}const sets=cur.co.includes('Body by Science')?cur.sets.filter(x=>x.kg!=null||x.reps!=null||x.tul!=null):[];
- if(cur.id){const e=E[cur.id];const d=fromLocal(when,cur.tz);if(cur.thumb){TH[e.id]=cur.thumb;saveThumbs()}Object.assign(e,{sets,vitc_mg:cur.vitc,ilosc:cur.ilosc,co:cur.co,opis:cur.opis,utc:d.toISOString(),local:localStr(d,cur.tz),offset_min:offMin(d,cur.tz)});push({op:'upsert',entry:cur.photo?Object.assign({},e,{foto_data:cur.photo}):e});toast('Zmieniono');closeSheet();render()}
- else{const nowStr=localStr(new Date(),devTz()).replace(' ','T');const t=cur.typ,f={ilosc:cur.ilosc,co:cur.co,opis:cur.opis,vitc_mg:cur.vitc,sets,photo:cur.photo,thumb:cur.thumb,when:when&&when!==nowStr?when:null};closeSheet();add(t,f)}}
+function saveSheet(){const il=$('#f_il');if(il)cur.ilosc=il.value===''?null:+il.value;if(cur.typ==='woda'){const v=+$('#f_vc').value||S.vitc;if(cur.vitc){cur.vitc=v;S.vitc=v;ls.set('settings',S);if(!cur.co.includes('Witamina C'))cur.co.push('Witamina C')}else cur.co=cur.co.filter(c=>c!=='Witamina C')}cur.opis=$('#f_op').value.trim();const kc=$('#f_kc');if(kc)cur.kcal=kc.value===''?null:+kc.value;const dawki=cur.typ==='suple'?Object.fromEntries(cur.co.map(c=>[c,cur.dawki[c]||doseDef(c)])):null;if(dawki){cur.co.forEach(c=>{S.lastDose=S.lastDose||{};S.lastDose[c]=dawki[c]});ls.set('settings',S)}const when=$('#f_when').value;if(sw){clearInterval(sw.h);sw=null}const sets=cur.co.includes('Body by Science')?cur.sets.filter(x=>x.kg!=null||x.reps!=null||x.tul!=null):[];
+ if(cur.id){const e=E[cur.id];const d=fromLocal(when,cur.tz);if(cur.thumb){TH[e.id]=cur.thumb;saveThumbs()}Object.assign(e,{sets,kcal:cur.kcal,dawki,vitc_mg:cur.vitc,ilosc:cur.ilosc,co:cur.co,opis:cur.opis,utc:d.toISOString(),local:localStr(d,cur.tz),offset_min:offMin(d,cur.tz)});push({op:'upsert',entry:cur.photo?Object.assign({},e,{foto_data:cur.photo}):e});toast('Zmieniono');closeSheet();render()}
+ else{const nowStr=localStr(rnd5(new Date()),devTz()).replace(' ','T');const t=cur.typ,f={ilosc:cur.ilosc,co:cur.co,opis:cur.opis,vitc_mg:cur.vitc,sets,kcal:cur.kcal,dawki,photo:cur.photo,thumb:cur.thumb,when:when&&when!==nowStr?when:null};closeSheet();add(t,f)}}
 
 /* ---------- Ekran: Historia ---------- */
 let filt='';
@@ -354,7 +386,7 @@ function vHistoria(){const L=list().filter(e=>!NOHIST[e.typ]&&(!filt||e.typ===fi
  ${days.length?days.map(d=>{const w=sumDay('woda',d),sl=sleepFor(d);return `<div class="day"><b>${dayName(d)}</b><span>${w?'woda '+(w/1000).toFixed(1).replace('.',',')+' l':''}${sl?' · sen '+sl.toFixed(1).replace('.',',')+' h':''}</span></div>`+
   L.filter(e=>dayOf(e)===d).map(e=>{const away=e.tz!==S.home;const homeT=away?localStr(new Date(e.utc),S.home).slice(11):'';
    if(e.typ==='lot'||e.typ==='sluzba'){const tz2=e.typ==='lot'?(AP[e.to]||'UTC'):e.tz;return `<div class="ent" style="--c:${col(e.typ)}"><i></i><span class="m"><b>${esc(e.typ==='lot'?e.fn+' '+e.from+' → '+e.to:e.code)}</b>${e.dh?' <small style="display:inline">przelot</small>':''}<small>${e.ci_utc?'meldowanie '+hm(e.ci_utc,e.tz)+' · ':''}${e.typ==='lot'?'przylot '+hm(e.arr_utc,tz2)+' '+esc(short(tz2)):'do '+hm(e.arr_utc,e.tz)}</small></span><span class="t">${e.local.slice(11)} ${esc(short(e.tz))}${e.tz!==S.home?`<small>dom ${localStr(new Date(e.utc),S.home).slice(11)}</small>`:''}</span></div>`}
-   return `<button class="ent" style="--c:${col(e.typ)}" data-edit="${e.id}"><i></i><span class="m"><b>${T[e.typ].n}</b> ${esc(val(e))}${pending(e.id)?'<span class="pend" title="Czeka na wysłanie"></span>':''}${(e.co&&e.co.length)||e.opis?`<small>${esc([...(e.co||[]).filter(c=>!(e.typ==='woda'&&c==='Witamina C')),e.opis].filter(Boolean).join(' · '))}</small>`:''}${e.sets&&e.sets.length?`<small>${esc(e.sets.map(x=>(MUS[x.ex]?MUS[x.ex][0].split(' (')[0]:x.ex)+' '+(x.kg??'–')+' kg × '+(x.reps??'–')+', '+(x.tul??'–')+' s').join(' · '))}</small>`:''}${TH[e.id]?`<img src="${TH[e.id]}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-top:6px;display:block">`:e.foto?'<small>ze zdjęciem</small>':''}</span><span class="t">${e.local.slice(11)}${sfx(e.tz)}${away?`<small>WAW ${homeT}C</small>`:''}</span></button>`}).join('')}).join('')
+   return `<button class="ent" style="--c:${col(e.typ)}" data-edit="${e.id}"><i></i><span class="m"><b>${T[e.typ].n}</b> ${esc(val(e))}${pending(e.id)?'<span class="pend" title="Czeka na wysłanie"></span>':''}${(e.co&&e.co.length&&!e.dawki)||e.opis?`<small>${esc([...(e.dawki?[]:(e.co||[])).filter(c=>!(e.typ==='woda'&&c==='Witamina C')),e.opis].filter(Boolean).join(' · '))}</small>`:''}${e.dawki&&Object.keys(e.dawki).length?`<small>${esc(Object.entries(e.dawki).map(([k,v])=>k+' '+v).join(' · '))}</small>`:''}${e.sets&&e.sets.length?`<small>${esc(e.sets.map(x=>(MUS[x.ex]?MUS[x.ex][0].split(' (')[0]:x.ex)+' '+(x.kg??'–')+' kg × '+(x.reps??'–')+', '+(x.tul??'–')+' s').join(' · '))}</small>`:''}${TH[e.id]?`<img src="${TH[e.id]}" alt="" style="width:64px;height:64px;object-fit:cover;border-radius:8px;margin-top:6px;display:block">`:e.foto?'<small>ze zdjęciem</small>':''}</span><span class="t">${e.local.slice(11)}${sfx(e.tz)}${away?`<small>WAW ${homeT}C</small>`:''}</span></button>`}).join('')}).join('')
  :'<section class="card"><p style="margin:0">Brak wpisów. Dodaj pierwszy na ekranie Dodaj.</p></section>'}`}
 
 /* ---------- Ekran: Grafik ---------- */
@@ -407,7 +439,7 @@ function vUst(){return `<section class="card"><h2>Połączenie z arkuszem</h2><l
  <section class="card"><h2>Strefa domowa i cele</h2><label for="s_home">Strefa domowa</label><input id="s_home" type="text" value="${esc(S.home)}"><p class="hint">Telefon jest teraz w strefie ${esc(devTz())} (${esc(short(devTz()))}). Każdy wpis zapisuje swoją strefę, więc godziny z postojów się nie mieszają.</p><label for="s_kc">Cel kalorii (kcal)</label><input id="s_kc" type="number" value="${esc(S.kcal||2300)}"><label for="s_cel">Cel wody (ml)</label><input id="s_cel" type="number" value="${esc(S.cel)}"><label for="s_vc">Witamina C w wodzie, domyślna dawka (mg)</label><input id="s_vc" type="number" value="${esc(S.vitc)}"><p class="hint">Mieszanka askorbinianu sodu z kwasem askorbinowym. Gdy na ekranie Dodaj zaznaczysz „z witaminą C”, każda porcja wody zapisze się z tą dawką.</p></section>
 ${(()=>{const ri=recInfo();return `<section class="card" id="sec-zal"><h2>Zalecenia</h2><p style="margin:0">${ri?'Ostatnia aktualizacja: <b>'+fmtDT(ri.tytul)+'</b>':'Jeszcze bez zaleceń.'}</p>${ri&&ri.tekst?`<p style="margin:8px 0 0">${esc(ri.tekst)}</p>`:''}<p class="hint">Claude aktualizuje je automatycznie 2 razy dziennie, ok. 7:40C i 18:40C, na podstawie wpisów i grafiku. Pobierają się przy synchronizacji.</p><a class="btnlink" href="https://claude.ai/new?q=${encodeURIComponent(REQ)}" target="_blank" rel="noopener">Poproś o zalecenia teraz</a><p class="hint">Otwiera Claude z gotową prośbą – wystarczy ją wysłać. Najpierw dodaj zaległe wpisy i poczekaj na synchronizację.</p></section>`})()}
  <section class="card"><h2>Grafik lotów</h2><p class="hint" style="margin:0 0 10px">Wgraj PDF „Individual plan” z CrewLink. Godziny z grafiku (UTC) zamienię na lokalne. Ponowne wgranie tego samego miesiąca (np. v2) zastępuje poprzednią wersję.</p><button class="pri" data-pdf="1">Wgraj grafik (PDF)</button><p class="hint" id="pdfmsg">${esc(pdfMsg)}</p><h2 style="margin-top:14px">Wgrane grafiki (pamiętam 2 ostatnie)</h2>${rostersHtml()}</section>
- <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wersja aplikacji: 11 (19.11.2026) · Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
+ <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wersja aplikacji: 12 (19.11.2026) · Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
 
 /* ---------- Render i zdarzenia ---------- */
 const TT={dodaj:'Dodaj',historia:'Historia',grafik:'Grafik',zalecenia:'Zalecenia',postep:'Postęp',ustawienia:'Ustawienia'};
@@ -433,22 +465,33 @@ $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet'){closeSheet();
  if(d.close)closeSheet();else if(d.save)saveSheet();
  else if(d.del){const x=E[cur.id];delete E[cur.id];push({op:'delete',id:x.id});closeSheet();toast('Usunięto');render()}
  else if(d.sc){cur.ilosc=+d.sc;b.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',c===b))}
- else if(d.q){$('#f_il').value=d.q}
+ else if(d.q){$('#f_il').value=d.q;updKc()}
+ else if(d.ds){cur.dawki[d.ds]=d.dv;$('#doses').innerHTML=dosesHtml()}
+ else if(d.pick){openDial($('#f_when').value)}
  else if(d.vc){cur.vitc=cur.vitc?null:(+$('#f_vc').value||S.vitc);b.classList.toggle('on')}
  else if(d.ph){$('#'+d.ph).click()}
  else if(d.co){if(SINGLE[cur.typ]){cur.co=cur.co[0]===d.co?[]:[d.co];b.parentNode.querySelectorAll('.chip').forEach(c=>c.classList.toggle('on',cur.co.includes(c.dataset.co)))}else{const i=cur.co.indexOf(d.co);i<0?cur.co.push(d.co):cur.co.splice(i,1);b.classList.toggle('on')}
+  if(cur.typ==='suple')$('#doses').innerHTML=dosesHtml();updKc();
   if(d.co==='Body by Science'){$('#bbs').style.display=cur.co.includes('Body by Science')?'block':'none'}}
  else if(d.addex){const p=$('#picker');p.innerHTML=p.innerHTML?'':pickerHtml()}
  else if(d.ex){const l=lastSet(d.ex);cur.sets.push({ex:d.ex,kg:l?l.kg:null,reps:null,tul:null});$('#picker').innerHTML='';$('#sets').innerHTML=setsHtml()}
  else if(d.rm){cur.sets.splice(+d.rm,1);if(sw){clearInterval(sw.h);sw=null}$('#sets').innerHTML=setsHtml()}
  else if(d.swi!==undefined){const i=+d.swi;if(sw&&sw.i===i){const sec=Math.round((Date.now()-sw.t0)/1000);clearInterval(sw.h);sw=null;cur.sets[i].tul=sec;$('#sets').innerHTML=setsHtml()}else{if(sw)clearInterval(sw.h);sw={i,t0:Date.now()};sw.h=setInterval(()=>{const el=$('#tul'+i);if(el)el.value=Math.round((Date.now()-sw.t0)/1000)},500);$('#sets').innerHTML=setsHtml()}}});
 $('#sheet').addEventListener('change',async e=>{if(!['f_ph','f_ph2'].includes(e.target.id)||!e.target.files[0])return;try{const f=e.target.files[0];cur.photo=await shrink(f,1024,.72);cur.thumb=await shrink(f,240,.6);const p=$('#f_prev');p.src=cur.thumb;p.style.display='block'}catch(x){toast('Nie udało się wczytać zdjęcia')}});
-$('#sheet').addEventListener('input',e=>{if(e.target.id==='f_il'&&e.target.type==='range')$('#f_v').textContent=e.target.value;const d=e.target.dataset;if(d.si!==undefined&&cur){cur.sets[+d.si][d.sf]=e.target.value===''?null:+e.target.value}});
+function updKc(){const k=$('#f_kc'),il=$('#f_il');if(!k||cur.kcalEd||!KCAL[cur.typ])return;const v=estKcal(cur.typ,cur.co,il?+il.value:0);k.value=v??''}
+$('#sheet').addEventListener('input',e=>{if(e.target.id==='f_kc')cur.kcalEd=true;if(e.target.id==='f_il')updKc();if(e.target.id==='f_il'&&e.target.type==='range')$('#f_v').textContent=e.target.value;const d=e.target.dataset;if(d.si!==undefined&&cur){cur.sets[+d.si][d.sf]=e.target.value===''?null:+e.target.value}});
 let pdfMsg='',picking=false;
 $('#pdfIn').addEventListener('change',async e=>{picking=false;const f=e.target.files[0];if(!f)return;pdfMsg='Czytam grafik '+f.name+'…';render();
  try{const t=await importRoster(f);pdfMsg='Wgrano: '+t;toast('Grafik wgrany')}catch(x){pdfMsg='Nie udało się: '+(x.message||x);toast('Błąd grafiku')}e.target.value='';render()});
 $('#pdfIn').addEventListener('click',()=>{picking=true});
 DARK.addEventListener&&DARK.addEventListener('change',render);
+$('#dialov').addEventListener('click',e=>{if(e.target.id==='dialov'){$('#dialov').classList.remove('open');return}const g=e.target.closest('[data-v]');if(g){const v=+g.dataset.v;if(DL.mode==='h'){DL.h=v;DL.mode='m'}else DL.m=v;drawDial();return}
+ const b=e.target.closest('button');if(!b)return;const d=b.dataset;
+ if(d.dd){const t=new Date(DL.date+'T12:00Z');t.setUTCDate(t.getUTCDate()+ +d.dd);DL.date=t.toISOString().slice(0,10);drawDial()}
+ else if(d.dm){DL.mode=d.dm;drawDial()}
+ else if(d.dx==='now'){const v=localStr(rnd5(new Date()),cur?cur.tz:devTz());DL={date:v.slice(0,10),h:+v.slice(11,13),m:+v.slice(14,16),mode:'h'};drawDial()}
+ else if(d.dx==='cancel')$('#dialov').classList.remove('open');
+ else if(d.dx==='ok'){const p=n=>String(n).padStart(2,'0');const v=`${DL.date}T${p(DL.h)}:${p(DL.m)}`;$('#f_when').value=v;$('#f_whenBtn').textContent=fmtWhen(v);$('#dialov').classList.remove('open')}});
 addEventListener('online',sync);document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!picking){render();sync()}});
 setInterval(clock,30000);setInterval(()=>{if(Q.length)sync()},60000);
 render();sync();
