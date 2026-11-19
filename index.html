@@ -22,7 +22,8 @@ main{max-width:640px;margin:0 auto;padding:calc(14px + env(safe-area-inset-top))
 h1{font-size:30px;line-height:1.05;margin:0;font-weight:800}
 h2{font-size:18px;margin:0 0 10px;font-weight:700}
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:14px}
-.loc{line-height:1.15}.loc b{font-size:28px;font-weight:800}.loc span{font-size:15px;color:var(--mute);font-weight:600}.loc small{display:block;font-size:14px;font-weight:500;color:var(--mute);margin-top:4px;max-width:62vw}
+header.home{display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;align-items:start}header.home #ttl,header.home .loc{display:contents}header.home .l1{grid-column:1/-1;line-height:1.15}header.home .loc small{grid-column:1;max-width:none;margin-top:2px}header.home .loc .lbl{margin-top:8px}header.home #now{grid-column:2;grid-row:2/span 4;align-self:start;margin-top:8px}
+.loc{line-height:1.15}.loc .l1{display:flex;align-items:baseline;flex-wrap:wrap;column-gap:6px}.loc .l1 em{font-style:normal;font-weight:500;font-size:12px;color:var(--mute);margin-left:14px}.loc .l1 em.in{color:var(--acc);font-weight:700}.loc .lbl{margin-top:8px;font-size:12px;text-transform:none}.loc .ev{color:var(--ink);font-weight:600;margin-top:1px}.loc b{font-size:28px;font-weight:800}.loc span{font-size:15px;color:var(--mute);font-weight:600}.loc small{display:block;font-size:14px;font-weight:500;color:var(--mute);margin-top:4px;max-width:62vw}
 .now{font-size:14px;color:var(--mute);text-align:right;line-height:1.3}
 .now b{color:var(--ink);font-size:16px;font-variant-numeric:tabular-nums}
 button,select{font:inherit;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 14px;cursor:pointer}
@@ -38,11 +39,11 @@ input[type=number],input[type=text],input[type=url],input[type=datetime-local],t
 textarea{padding:10px 12px;min-height:70px}
 input[type=range]{width:100%;accent-color:var(--sea);min-height:36px}
 .water{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center}
-.ring{width:min(180px,44vw);aspect-ratio:1;position:relative;justify-self:center}
+.ring{width:min(135px,33vw);aspect-ratio:1;position:relative;justify-self:center}
 .ring svg{width:100%;height:100%;transform:rotate(-90deg)}
 .ring .v{transition:stroke-dashoffset .5s ease}
 .ring div{position:absolute;inset:0;display:grid;place-content:center;text-align:center}
-.ring b{font-size:clamp(28px,8vw,40px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
+.ring b{font-size:clamp(22px,6vw,30px);font-weight:800;line-height:1;font-variant-numeric:tabular-nums}
 .ring span{font-size:13px;color:var(--mute)}
 .wbtn{display:grid;gap:8px}
 .hint{font-size:14px;color:var(--mute);margin:8px 0 0}
@@ -112,14 +113,14 @@ const T={
  woda:{n:'Woda',u:'ml',c:'#1f8fd0'},posilek:{n:'Posiłek',u:'kcal',c:'#e08a1e'},kawa:{n:'Kawa',u:'ml',c:'#8a5a3b'},
  spac:{n:'Idę spać',u:'',c:'#6b5bd6'},pobudka:{n:'Pobudka',u:'/5',c:'#e2b714'},drzemka:{n:'Drzemka',u:'min',c:'#7d8b96'},
  trening:{n:'Trening',u:'min',c:'#0a7d55'},suple:{n:'Suplementy',u:'',c:'#d0508a'},bol:{n:'Ból',u:'/10',c:'#ff5a3c'},
- alergia:{n:'Alergia',u:'/3',c:'#f07b2c'},energia:{n:'Energia',u:'/5',c:'#c9a400'},waga:{n:'Waga',u:'kg',c:'#55707f'},alkohol:{n:'Alkohol',u:'ml',c:'#8e3b5c'},lot:{n:'Lot',u:'',c:'#1d3557'},sluzba:{n:'Służba',u:'',c:'#7a8a99'},notatka:{n:'Notatka',u:'',c:'#9aa7b0'}};
-const NIGHT={woda:'#e07b39',posilek:'#d9a441',kawa:'#a0522d',spac:'#c0504d',pobudka:'#e0b04a',drzemka:'#8c6a55',trening:'#cf7a3a',suple:'#d4706a',bol:'#e5533d',alergia:'#d98a3a',energia:'#e3b448',waga:'#9a7a66',notatka:'#8a7568',alkohol:'#b5485d',lot:'#a35a3a',sluzba:'#7d6355'};
+ alergia:{n:'Alergia',u:'/3',c:'#f07b2c'},energia:{n:'Energia',u:'/5',c:'#c9a400'},waga:{n:'Waga',u:'kg',c:'#55707f'},alkohol:{n:'Alkohol',u:'ml',c:'#8e3b5c'},napoj:{n:'Inne napoje',u:'ml',c:'#3a9e8f'},lot:{n:'Lot',u:'',c:'#1d3557'},sluzba:{n:'Służba',u:'',c:'#7a8a99'},notatka:{n:'Notatka',u:'',c:'#9aa7b0'}};
+const NIGHT={woda:'#e07b39',posilek:'#d9a441',kawa:'#a0522d',spac:'#c0504d',pobudka:'#e0b04a',drzemka:'#8c6a55',trening:'#cf7a3a',suple:'#d4706a',bol:'#e5533d',alergia:'#d98a3a',energia:'#e3b448',waga:'#9a7a66',notatka:'#8a7568',alkohol:'#b5485d',napoj:'#c98b5a',lot:'#a35a3a',sluzba:'#7d6355'};
 const DARK=window.matchMedia?matchMedia('(prefers-color-scheme: dark)'):{matches:false};
 const col=k=>DARK.matches&&NIGHT[k]?NIGHT[k]:T[k].c;
 const CO={trening:['Body by Science','Izometria kolan','Kolana powolne','Kręgosłup','Spacer'],
  suple:['D3','Magnez','Omega-3','Kreatyna','Kolagen + C','Witamina C'],bol:['Kolano lewe','Kolano prawe','Plecy'],
- alergia:['Katar','Oczy','Kichanie','Lek przeciwhistaminowy'],alkohol:['Piwo','Wino','Wódka / mocny','Cydr','Inne'],kawa:['Czarna','Z mlekiem']};
-const SINGLE={kawa:1};
+ alergia:['Katar','Oczy','Kichanie','Lek przeciwhistaminowy'],alkohol:['Piwo','Wino','Wódka / mocny','Cydr','Inne'],kawa:['Czarna','Z mlekiem'],napoj:['Cola','Cola zero','Woda kokosowa','Sok','Napój izotoniczny','Herbata','Inny']};
+const SINGLE={kawa:1,napoj:1};
 const SCALE={pobudka:[1,5],energia:[1,5],alergia:[1,3]};
 const EX=[
  ['Body by Science','Wyciąg górny','Uda zablokowane, ściągasz drążek do klatki przez 4–5 s, oddajesz przez 4–5 s. Bez szarpania tułowiem. Do upadku, 60–120 s.','https://www.youtube.com/watch?v=3JL9PoZy5G0'],
@@ -221,18 +222,19 @@ function nextEvent(){const now=new Date().toISOString(),c=[];
   if(e.typ==='sluzba'&&e.utc>now)c.push({t:e.utc,tz:e.tz,txt:e.code==='STBTEL'?'dyżur telefoniczny':e.code})});
  c.sort((a,b)=>a.t.localeCompare(b.t));return c[0]||null}
 function inTxt(iso){const m=Math.round((new Date(iso)-Date.now())/60000);if(m<60)return 'za '+m+' min';if(m<1440)return 'za '+Math.floor(m/60)+' h '+(m%60)+' min';const d=Math.round(m/1440);return 'za '+d+(d===1?' dzień':' dni')}
+const ICAO={WAW:'EPWA',KTW:'EPKT',WRO:'EPWR',KRK:'EPKK',GDN:'EPGD',POZ:'EPPO',RZE:'EPRZ',SZZ:'EPSC',BZG:'EPBY',LUZ:'EPLB',ORD:'KORD',DFW:'KDFW',YYZ:'CYYZ',YUL:'CYUL',EWR:'KEWR',JFK:'KJFK',IAD:'KIAD',BOS:'KBOS',MIA:'KMIA',LAX:'KLAX',SFO:'KSFO',SEA:'KSEA',CUN:'MMUN',PUJ:'MDPC',NRT:'RJAA',HND:'RJTT',ICN:'RKSI',DEL:'VIDP',BOM:'VABB',BKK:'VTBS',HKT:'VTSP',SIN:'WSSS',HKG:'VHHH',PEK:'ZBAA',PKX:'ZBAD',PVG:'ZSPD',TAS:'UTTT',DXB:'OMDB',TLV:'LLBG',CMB:'VCBI',MLE:'VRMM',ZNZ:'HTZA',AMS:'EHAM',LHR:'EGLL',CDG:'LFPG',FRA:'EDDF',MUC:'EDDM',BUD:'LHBP',VIE:'LOWW',PRG:'LKPR',CPH:'EKCH',ARN:'ESSA',ZRH:'LSZH'};
 const RR=()=>R.filter(x=>x.data!=='info');
 const recInfo=()=>R.find(x=>x.data==='info')||null;
 const fmtDT=(iso,tz)=>new Date(iso).toLocaleString('pl-PL',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit',timeZone:tz||S.home});
 function woclWins(a,b){const out=[];let d=new Date(new Date(a).getTime()-864e5);const end=new Date(new Date(b).getTime()+864e5);
  while(d<end){const ds=localStr(d,S.home).slice(0,10);const s0=fromLocal(ds+'T02:00',S.home),s1=fromLocal(ds+'T06:00',S.home);if(s1>new Date(a)&&s0<new Date(b))out.push([s0,s1]);d=new Date(d.getTime()+864e5)}return out}
 function woclOverlap(a,b){return woclWins(a,b).reduce((m,[s0,s1])=>m+Math.max(0,(Math.min(s1,new Date(b))-Math.max(s0,new Date(a)))/60000),0)}
-function woclNow(){const n=new Date(),h=+localStr(n,S.home).slice(11,13);if(h>=2&&h<6)return '<b style="color:var(--acc)">WOCL teraz</b> (do 06:00 WAW)';
- const ds=localStr(new Date(n.getTime()+(h>=6?864e5:0)),S.home).slice(0,10);return 'WOCL '+inTxt(fromLocal(ds+'T02:00',S.home).toISOString())+' (02–06 WAW)'}
+function woclNow(){const n=new Date(),h=+localStr(n,S.home).slice(11,13);if(h>=2&&h<6)return '<em class="in">WOCL teraz · do 06:00 WAW</em>';
+ const ds=localStr(new Date(n.getTime()+(h>=6?864e5:0)),S.home).slice(0,10);return '<em>WOCL '+inTxt(fromLocal(ds+'T02:00',S.home).toISOString())+'</em>'}
 function headLoc(){const w=whereNow(),n=nextEvent();let main;
- if(w.air)main=`<b>W locie</b> <span>${esc(w.air.fn)} ${esc(w.air.from)} → ${esc(w.air.to)}</span>`;
- else if(w.ap)main=`<b>${esc(CITY[w.ap]||w.ap)}</b> <span>${esc(w.ap)}</span>`;else main='<b>Dodaj</b>';
- const ri=recInfo();return `<div class="loc">${main}${n?`<small>Następnie: ${esc(n.txt)} · ${hm(n.t,n.tz)} ${esc(short(n.tz))} · ${inTxt(n.t)}</small>`:(rosters().length?'':'<small>Wgraj grafik w Ustawieniach</small>')}<small>${woclNow()}</small><small><a href="#ustawienia" data-go="sec-zal">Zalecenia: ${ri?'aktualizacja '+fmtDT(ri.tytul):'brak'} ›</a></small></div>`}
+ if(w.air)main=`<b>W locie</b> <span>${esc(w.air.fn)} ${esc(ICAO[w.air.from]||w.air.from)}–${esc(ICAO[w.air.to]||w.air.to)}</span>`;
+ else if(w.ap)main=`<b>${esc(CITY[w.ap]||w.ap)}</b> <span>${esc(ICAO[w.ap]||w.ap)}</span>`;else main='<b>Dodaj</b>';
+ const ri=recInfo();return `<div class="loc"><div class="l1">${main}${woclNow()}</div>${n?`<small class="lbl">Następne wydarzenie:</small><small class="ev">${esc(n.txt)} · ${hm(n.t,n.tz)} ${esc(short(n.tz))}</small><small>${inTxt(n.t)}</small>`:(rosters().length?'':'<small>Wgraj grafik w Ustawieniach</small>')}<small><a href="#ustawienia" data-go="sec-zal">Zalecenia: ${ri?'aktualizacja '+fmtDT(ri.tytul):'brak'} ›</a></small></div>`}
 function rosterNag(){const d=new Date(),day=+localStr(d,S.home).slice(8,10);if(day<17)return'';const nm=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth()+1,1)).toISOString().slice(0,7);
  return rosters().some(g=>g.start.slice(0,7)===nm)?'':`<section class="card" style="border:2px solid var(--acc)"><p style="margin:0">Grafik na <b>${monthName(nm+'-01T00:00:00Z')}</b> powinien być już dostępny (publikacja 17.). Wgraj go w <a href="#ustawienia">Ustawieniach</a>.</p></section>`}
 const ls={get(k,d){try{const v=localStorage.getItem('dz_'+k);return v?JSON.parse(v):d}catch(e){return d}},set(k,v){try{localStorage.setItem('dz_'+k,JSON.stringify(v))}catch(e){}}};
@@ -284,11 +286,11 @@ function sleepFor(day){const L=list().slice().reverse();const w=L.find(e=>e.typ=
 
 /* ---------- Ekran: Dodaj ---------- */
 function vDodaj(){const day=todayLocal(),w=sumDay('woda',day),cel=S.cel||3000,p=Math.min(1,w/cel),C=2*Math.PI*52;
- const tiles=['posilek','kawa','alkohol','spac','pobudka','drzemka','trening','suple','bol','alergia','energia','waga','notatka'];
+ const tiles=['posilek','kawa','napoj','alkohol','spac','pobudka','drzemka','trening','suple','bol','alergia','energia','waga','notatka'];
  const lastW=list().find(e=>e.typ==='woda'&&dayOf(e)===day);
  return rosterNag()+`<section class="card"><h2>Woda dziś</h2><div class="water"><div class="ring"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="52" fill="none" stroke="var(--sea2)" stroke-width="12"/><circle class="v" cx="60" cy="60" r="52" fill="none" stroke="${p>=1?'var(--ok)':'var(--sea)'}" stroke-width="12" stroke-linecap="round" stroke-dasharray="${C}" stroke-dashoffset="${C*(1-p)}"/></svg><div><b>${(w/1000).toFixed(2).replace('.',',')}</b><span>z ${(cel/1000).toFixed(1).replace('.',',')} l</span></div></div>
  <div class="wbtn"><button class="pri" data-w="250">+250 ml</button><button class="pri" data-w="500">+500 ml</button><button class="pri" data-w="500" data-c="1">+500 z wit. C</button><button data-open="woda">Inna ilość</button>${lastW?`<button data-undo="${lastW.id}">Cofnij ${esc(lastW.ilosc)} ml</button>`:''}</div></div>
- <p class="hint">W locie 200–250 ml co godzinę służby. Kawa i herbata się nie liczą.</p></section>
+ <p class="hint">${sumDay('napoj',day)?'Inne napoje dziś: '+sumDay('napoj',day)+' ml (nie wliczam do wody). ':''}W locie 200–250 ml co godzinę służby. Kawa i herbata się nie liczą.</p></section>
  <section><div class="tiles">${tiles.map(k=>`<button class="tile" style="--c:${col(k)}" data-open="${k}"><i></i>${T[k].n}${k==='kawa'?`<small>dziś ${list().filter(e=>e.typ==='kawa'&&dayOf(e)===day).length}</small>`:''}</button>`).join('')}</div></section>`}
 
 /* ---------- Arkusz wpisu (nowy lub edycja) ---------- */
@@ -300,10 +302,11 @@ function openSheet(typ,entry){const e=entry||{typ,ilosc:null,co:[],opis:''};cur=
  else if(sc)f+=`${cur.typ==='pobudka'?`<p class="hint">Oceń 15–30 minut po wstaniu, biorąc pod uwagę trzy rzeczy: jak szybko zasnąłeś, ile razy się budziłeś i czy czujesz się wypoczęty.<br><b>1</b> – długo zasypiałeś, częste wybudzenia, wstajesz zmęczony<br><b>2</b> – słabo, kilka wybudzeń, ciężki poranek<br><b>3</b> – przeciętnie, da się funkcjonować<br><b>4</b> – dobrze, 1–2 krótkie wybudzenia, wypoczęty<br><b>5</b> – świetnie, szybko zasnąłeś, spałeś ciągiem, pełna energia</p>`:''}<label>${cur.typ==='pobudka'?'Jakość snu':cur.typ==='alergia'?'Nasilenie objawów':'Poziom energii'}</label><div class="chips">${Array.from({length:sc[1]-sc[0]+1},(_,i)=>i+sc[0]).map(n=>`<button class="chip ${+cur.ilosc===n?'on':''}" data-sc="${n}">${n}</button>`).join('')}</div>`;
  else if(t.u&&cur.typ!=='spac')f+=`<label for="f_il">${cur.typ==='trening'?'Czas treningu lub spaceru (min)':`Ilość (${t.u})`}${cur.typ==='posilek'?', opcjonalnie':''}</label><input id="f_il" type="number" inputmode="decimal" step="any" value="${esc(cur.ilosc)}">`;
  if(cur.typ==='woda')f+=`<div class="chips" style="margin-top:8px">${[150,250,330,500,750].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div><div class="row" style="margin-top:12px"><button class="chip ${cur.vitc?'on':''}" data-vc="1">Z witaminą C</button><input id="f_vc" type="number" inputmode="numeric" style="width:110px" value="${esc(cur.vitc||S.vitc)}"><span class="hint" style="margin:0">mg</span></div>`;
+ if(cur.typ==='napoj')f+=`<div class="chips" style="margin-top:8px">${[200,250,330,500].map(n=>`<button class="chip" data-q="${n}">${n} ml</button>`).join('')}</div>`;
  if(cur.typ==='kawa')f+=`<div class="chips" style="margin-top:8px">${[50,100,250,400].map(n=>`<button class="chip" data-q="${n}">${n} ml</button>`).join('')}</div>`;
  if(cur.typ==='alkohol')f+=`<div class="chips" style="margin-top:8px">${[40,100,150,330,500].map(n=>`<button class="chip" data-q="${n}">${n}</button>`).join('')}</div>`;
  if(cur.typ==='posilek')f+=`<label>Zdjęcie</label>${(cur.id&&TH[cur.id])?`<img src="${TH[cur.id]}" alt="" style="width:120px;border-radius:12px;display:block;margin-bottom:8px">`:''}<img id="f_prev" alt="" style="width:120px;border-radius:12px;display:none;margin-bottom:8px"><input id="f_ph" type="file" accept="image/*" capture="environment" style="display:none"><input id="f_ph2" type="file" accept="image/*" style="display:none"><div class="row"><button data-ph="f_ph">${cur.id?'Nowe zdjęcie':'Zrób zdjęcie'}</button><button data-ph="f_ph2">Z galerii</button></div>`;
- if(CO[cur.typ])f+=`<label>${cur.typ==='trening'?'Rodzaj':cur.typ==='bol'?'Gdzie boli':cur.typ==='suple'?'Co wziąłeś':cur.typ==='alkohol'?'Rodzaj':cur.typ==='kawa'?'Rodzaj kawy':'Objawy'}</label><div class="chips">${CO[cur.typ].map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
+ if(CO[cur.typ])f+=`<label>${cur.typ==='trening'?'Rodzaj':cur.typ==='bol'?'Gdzie boli':cur.typ==='suple'?'Co wziąłeś':cur.typ==='alkohol'?'Rodzaj':cur.typ==='kawa'?'Rodzaj kawy':cur.typ==='napoj'?'Rodzaj napoju':'Objawy'}</label><div class="chips">${CO[cur.typ].map(c=>`<button class="chip ${cur.co.includes(c)?'on':''}" data-co="${esc(c)}">${esc(c)}</button>`).join('')}</div>`;
  if(cur.typ==='trening')f+=`<div id="bbs" style="display:${cur.co.includes('Body by Science')?'block':'none'}"><label>Ćwiczenia Body by Science</label><div id="sets">${setsHtml()}</div><button data-addex="1" style="width:100%;margin-top:4px">+ Dodaj ćwiczenie</button><div id="picker"></div></div>`;
  f+=`<label for="f_op">${cur.typ==='posilek'?'Co zjadłeś':'Notatka'}${cur.typ==='notatka'||cur.typ==='posilek'?'':' (opcjonalnie)'}</label><textarea id="f_op">${esc(cur.opis)}</textarea>`;
  f+=`<label for="f_when">Godzina (${esc(short(cur.tz))}${cur.tz!==devTz()?' – strefa z chwili wpisu':''})</label><input id="f_when" type="datetime-local" value="${whenVal}">`;
@@ -380,13 +383,13 @@ function vUst(){return `<section class="card"><h2>Połączenie z arkuszem</h2><l
  <section class="card"><h2>Strefa domowa i cele</h2><label for="s_home">Strefa domowa</label><input id="s_home" type="text" value="${esc(S.home)}"><p class="hint">Telefon jest teraz w strefie ${esc(devTz())} (${esc(short(devTz()))}). Każdy wpis zapisuje swoją strefę, więc godziny z postojów się nie mieszają.</p><label for="s_cel">Cel wody (ml)</label><input id="s_cel" type="number" value="${esc(S.cel)}"><label for="s_vc">Witamina C w wodzie, domyślna dawka (mg)</label><input id="s_vc" type="number" value="${esc(S.vitc)}"><p class="hint">Mieszanka askorbinianu sodu z kwasem askorbinowym. Przycisk „+500 z wit. C” zapisuje tę dawkę.</p></section>
 ${(()=>{const ri=recInfo();return `<section class="card" id="sec-zal"><h2>Zalecenia</h2><p style="margin:0">${ri?'Ostatnia aktualizacja: <b>'+fmtDT(ri.tytul)+'</b>':'Jeszcze bez zaleceń.'}</p>${ri&&ri.tekst?`<p style="margin:8px 0 0">${esc(ri.tekst)}</p>`:''}<p class="hint">Zalecenia przygotowuje Claude na podstawie Twoich wpisów i grafiku. Pobierają się przy synchronizacji.</p></section>`})()}
  <section class="card"><h2>Grafik lotów</h2><p class="hint" style="margin:0 0 10px">Wgraj PDF „Individual plan” z CrewLink. Godziny z grafiku (UTC) zamienię na lokalne. Ponowne wgranie tego samego miesiąca (np. v2) zastępuje poprzednią wersję.</p><button class="pri" data-pdf="1">Wgraj grafik (PDF)</button><p class="hint" id="pdfmsg">${esc(pdfMsg)}</p><h2 style="margin-top:14px">Wgrane grafiki (pamiętam 2 ostatnie)</h2>${rostersHtml()}</section>
- <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wersja aplikacji: 8 (19.11.2026) · Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
+ <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wersja aplikacji: 9 (19.11.2026) · Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
 
 /* ---------- Render i zdarzenia ---------- */
 const TT={dodaj:'Dodaj',historia:'Historia',grafik:'Grafik',zalecenia:'Zalecenia',postep:'Postęp',ustawienia:'Ustawienia'};
 const route=()=>{const h=location.hash.slice(1);return TT[h]?h:'dodaj'};
 function clock(){if(route()==='dodaj'&&!document.querySelector('.sheet.open'))$('#ttl').innerHTML=headLoc();const tz=devTz(),n=new Date();$('#now').innerHTML=`<b>${localStr(n,tz).slice(11)}</b> ${esc(short(tz))}<br>${n.toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short',timeZone:tz})}${tz!==S.home?` · dom ${localStr(n,S.home).slice(11)}`:''}`}
-function render(){const r=route();if(r==='dodaj')$('#ttl').innerHTML=headLoc();else $('#ttl').textContent=TT[r];document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.r===r));
+function render(){const r=route();document.querySelector('header').classList.toggle('home',r==='dodaj');if(r==='dodaj')$('#ttl').innerHTML=headLoc();else $('#ttl').textContent=TT[r];document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.r===r));
  $('#view').innerHTML={grafik:vGrafikTab,dodaj:vDodaj,historia:vHistoria,zalecenia:vZal,postep:vPostep,ustawienia:vUst}[r]();clock();status()}
 addEventListener('hashchange',()=>{render();scrollTo(0,0)});
 $('#ttl').addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(!a)return;e.preventDefault();location.hash='ustawienia';setTimeout(()=>{const el=document.getElementById(a.dataset.go);if(el)el.scrollIntoView({behavior:'smooth'})},80)});
