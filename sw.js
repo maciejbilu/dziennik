@@ -1,5 +1,5 @@
 // Service worker: aplikacja działa offline. Dane do arkusza zawsze idą przez sieć.
-const CACHE = 'dziennik-v20';
+const CACHE = 'dziennik-v21';
 const FILES = ['./', './index.html', './manifest.json', './icon.svg', './pdf.min.mjs', './pdf.worker.min.mjs'];
 
 self.addEventListener('install', e => {
