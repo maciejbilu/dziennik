@@ -63,8 +63,8 @@ input[type=range]{width:100%;accent-color:var(--sea);min-height:36px}
 .sheet.open{display:flex}
 .sheet>div{background:var(--bg);width:100%;max-width:640px;max-height:88vh;overflow:auto;border-radius:20px 20px 0 0;padding:18px max(4vw,16px) calc(18px + env(safe-area-inset-bottom))}
 .sheet .acts{display:flex;gap:8px;margin-top:16px}.sheet .acts button{flex:1}
-nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,minmax(0,1fr));padding:4px max(2vw,6px) calc(4px + env(safe-area-inset-bottom));z-index:10}
-nav a{color:var(--mute);text-decoration:none;font-size:11px;font-weight:600;text-align:center;padding:8px 0;min-height:52px}
+nav{position:fixed;left:0;right:0;bottom:0;background:var(--bg);border-top:1px solid var(--line);display:flex;overflow-x:auto;scrollbar-width:none;padding:4px 4px calc(4px + env(safe-area-inset-bottom));z-index:10}nav::-webkit-scrollbar{display:none}
+nav a{flex:1 0 64px;color:var(--mute);text-decoration:none;font-size:11px;font-weight:600;text-align:center;padding:8px 2px;min-height:52px;white-space:nowrap}
 nav a i{display:block;width:22px;height:4px;border-radius:2px;margin:2px auto 6px;background:currentColor;opacity:.35}
 nav a.on{color:var(--sea)}nav a.on i{opacity:1}
 .toast{position:fixed;left:50%;bottom:calc(90px + env(safe-area-inset-bottom));transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-size:14px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:30;white-space:nowrap}
@@ -75,6 +75,11 @@ nav a.on{color:var(--sea)}nav a.on i{opacity:1}
 .rec{background:var(--rec);color:#fff7ef}.rec .hint{color:#fff7efcc}
 details{border-top:1px solid var(--line);padding:10px 0}details summary{font-weight:600;cursor:pointer;min-height:32px}
 .mus{flex:none;display:block}
+.exi{flex:none;width:44px;height:44px;display:block}.exi .p{stroke:var(--mus)}.exi .h{stroke:var(--hl)}.exi .e{stroke:var(--line)}.exi .hd{fill:var(--mus)}
+details.card{border-top:0;padding:16px}details.card>summary{list-style:none;display:flex;align-items:center;justify-content:space-between;gap:10px;font-size:18px;font-weight:700}details.card>summary::-webkit-details-marker{display:none}details.card>summary::after{content:'›';font-size:22px;color:var(--mute);transition:transform .2s}details.card[open]>summary::after{transform:rotate(90deg)}details.card>summary span{flex:1}
+details.ex>summary{display:flex;align-items:center;gap:10px}details.ex>summary span{flex:1}
+.pl{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--line)}.pl:first-of-type{border-top:0}.pl .t{flex:none;width:62px;font-weight:700;font-variant-numeric:tabular-nums}.pl .x{flex:1}.pl.past{opacity:.5}
+.bp{display:grid;grid-template-columns:1fr 1fr;gap:8px}.bpimg{position:relative;border-radius:12px;overflow:hidden;background:var(--sea2);min-height:120px}.bpimg img{display:block;width:100%;height:auto}.bpimg svg{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}.bpimg.noov svg{display:none}.bpimg small{position:absolute;left:6px;top:6px;background:#000a;color:#fff;border-radius:6px;padding:0 6px;font-size:12px}
 .timebtn{width:100%;text-align:left;font-weight:600}
 .dialov{position:fixed;inset:0;background:#0009;display:none;align-items:center;justify-content:center;z-index:40}.dialov.open{display:flex}
 .dialbox{background:var(--bg);border-radius:20px;padding:16px;width:min(340px,92vw)}
@@ -104,16 +109,18 @@ a{color:var(--sea)}.btnlink{display:inline-flex;align-items:center;min-height:44
 </main>
 <nav id="nav">
   <a href="#dodaj" data-r="dodaj"><i></i>Dodaj</a>
+  <a href="#plan" data-r="plan"><i></i>Plan dnia</a>
   <a href="#historia" data-r="historia"><i></i>Historia</a>
   <a href="#grafik" data-r="grafik"><i></i>Grafik</a>
   <a href="#zalecenia" data-r="zalecenia"><i></i>Zalecenia</a>
   <a href="#postep" data-r="postep"><i></i>Postęp</a>
+  <a href="#sylwetka" data-r="sylwetka"><i></i>Przed i po</a>
   <a href="#ustawienia" data-r="ustawienia"><i></i>Ustawienia</a>
 </nav>
 <div class="sheet" id="sheet"><div id="sh"></div></div>
 <div class="toast" id="toast"></div>
 <div class="dialov" id="dialov"><div class="dialbox"><div class="dialhead"><button data-dd="-1" aria-label="Poprzedni dzień">‹</button><b id="dDate"></b><button data-dd="1" aria-label="Następny dzień">›</button></div><div class="dialtime"><button id="dH" data-dm="h"></button><span>:</span><button id="dM" data-dm="m"></button></div><svg id="dsvg" viewBox="0 0 240 240"></svg><div class="acts"><button data-dx="now">Teraz</button><button data-dx="cancel">Anuluj</button><button class="pri" data-dx="ok">OK</button></div></div></div>
-<input id="pdfIn" type="file" accept="application/pdf,.pdf" style="display:none">
+<input id="pdfIn" type="file" accept="application/pdf,.pdf" style="display:none"><input id="bpCam" type="file" accept="image/*" capture="user" style="display:none"><input id="bpGal" type="file" accept="image/*" style="display:none">
 <script>
 {
 /* ---------- Dane i typy ---------- */
@@ -409,7 +416,7 @@ function saveSheet(){const il=$('#f_il');if(il)cur.ilosc=il.value===''?null:+il.
 
 /* ---------- Ekran: Historia ---------- */
 let filt='';
-const NOHIST={grafik:1,lot:1,sluzba:1,profil:1};
+const NOHIST={grafik:1,lot:1,sluzba:1,profil:1,sylwetka:1};
 function vHistoria(){const L=list().filter(e=>!NOHIST[e.typ]&&(!filt||e.typ===filt));const days=[...new Set(L.map(dayOf))];
  const types=[...new Set(list().map(e=>e.typ))].filter(k=>T[k]&&!NOHIST[k]);
  return `<div class="chips" style="margin-bottom:6px"><button class="chip ${!filt?'on':''}" data-f="">Wszystko</button>${types.map(k=>`<button class="chip ${filt===k?'on':''}" data-f="${k}">${T[k].n}</button>`).join('')}</div>
@@ -436,15 +443,81 @@ function vGrafikTab(){const now=new Date().toISOString();const A=Object.values(E
 /* ---------- Ekran: Zalecenia ---------- */
 function vGrafik(){const now=new Date().toISOString();const U=Object.values(E).filter(e=>(e.typ==='lot'||e.typ==='sluzba')&&(e.arr_utc||e.utc)>=now).sort((a,b)=>a.utc.localeCompare(b.utc)).slice(0,8);
  return `<section class="card"><h2>Najbliższe służby</h2>${rosters().length?`<p class="hint" style="margin:0 0 6px">Na podstawie grafiku: ${rosters().map(g=>monthName(g.start)).join(', ')}</p>`:''}${U.length?U.map(e=>`<p style="margin:6px 0"><b>${dayName(e.local.slice(0,10))} ${e.local.slice(11)} ${esc(short(e.tz))}</b> · ${esc(e.typ==='lot'?e.fn+' '+e.from+' → '+e.to:e.code)}${e.typ==='lot'?` <span class="hint">(przylot ${hm(e.arr_utc,AP[e.to]||'UTC')} ${esc(short(AP[e.to]||'UTC'))})</span>`:''}</p>`).join(''):'<p class="hint" style="margin:0">Brak grafiku. Wgraj PDF z CrewLink w Ustawieniach.</p>'}</section>`}
+
+/* ---------- Ikony ćwiczeń: ludzik w pozie, zaznaczone pracujące mięśnie ---------- */
+const POSES={
+ pulldown:{hd:[19,8],s:[['klat',19,14,20,30],['ram',19,14,24,8],['prz',24,8,22,2],['udo',20,30,31,30],['gol',31,30,31,42]],e:[[12,2,32,2],[22,2,22,0],[12,32,27,32],[13,32,13,14]],h:['klat','ram']},
+ chest:{hd:[19,8],s:[['klat',19,14,20,30],['ram',19,14,27,17],['prz',27,17,35,15],['udo',20,30,31,30],['gol',31,30,31,42]],e:[[35,10,35,20],[12,32,27,32],[13,32,13,12]],h:['klat','ram']},
+ row:{hd:[19,8],s:[['klat',19,14,20,30],['ram',19,14,12,20],['prz',12,20,22,21],['udo',20,30,31,30],['gol',31,30,31,42]],e:[[22,21,44,21],[44,14,44,44],[12,32,27,32]],h:['klat','ram']},
+ ohp:{hd:[19,8],s:[['klat',19,14,20,30],['bark',19,14,19,14],['ram',19,14,26,12],['prz',26,12,24,3],['udo',20,30,31,30],['gol',31,30,31,42]],e:[[20,3,30,3],[12,32,27,32],[13,32,13,12]],h:['bark','ram']},
+ legpress:{hd:[6,19],s:[['klat',9,23,19,32],['udo',19,32,27,22],['gol',27,22,37,28],['ram',11,25,16,31]],e:[[38,18,36,38],[6,36,22,36],[4,28,8,36]],h:['udo']},
+ squat:{hd:[21,9],s:[['klat',20,14,16,30],['ram',20,15,28,20],['prz',28,20,33,21],['udo',16,30,26,32],['gol',26,32,26,43]],e:[[26,32,44,32],[44,20,44,44],[10,44,40,44]],h:['udo']},
+ legext:{hd:[17,8],s:[['klat',17,14,18,30],['ram',17,15,20,24],['udo',18,30,29,30],['gol',29,30,37,38]],e:[[11,32,27,32],[12,32,12,12],[37,36,39,40]],h:['udo']},
+ curlup:{hd:[8,34],s:[['klat',11,36,28,39],['ram',13,37,20,40],['udo',28,39,34,32],['gol',34,32,38,40],['udo',28,39,38,40],['gol',38,40,45,40]],e:[[2,42,47,42]],h:['klat']},
+ sideplank:{hd:[9,26],s:[['klat',12,30,27,34],['ram',12,30,12,40],['prz',12,40,19,40],['udo',27,34,35,37],['gol',35,37,43,40]],e:[[2,42,47,42]],h:['klat']},
+ birddog:{hd:[11,20],s:[['klat',15,24,30,25],['ram',15,24,5,20],['ram',16,24,16,40],['udo',30,25,31,39],['gol',31,39,41,40],['udo',30,25,40,22],['gol',40,22,47,20]],e:[[2,42,47,42]],h:['klat','udo']},
+ pallof:{hd:[24,7],s:[['klat',24,12,24,28],['ram',24,14,30,18],['prz',30,18,37,18],['udo',24,28,21,36],['gol',21,36,21,44],['udo',24,28,28,36],['gol',28,36,29,44]],e:[[37,18,46,18],[46,8,46,44]],h:['klat']},
+ walk:{hd:[24,7],s:[['klat',24,12,24,27],['ram',24,14,19,22],['prz',19,22,17,28],['ram',24,14,28,21],['prz',28,21,32,25],['udo',24,27,17,35],['gol',17,35,14,44],['udo',24,27,30,35],['gol',30,35,30,44]],e:[[6,45,42,45]],h:['udo','gol']}};
+function poseSvg(k,sz){const p=POSES[k];if(!p)return'';sz=sz||44;const hl=new Set(p.h);
+ const seg=x=>{const [part,x1,y1,x2,y2]=x;const w=part==='klat'?6:part==='bark'?7:part==='udo'?5:3.6;return `<line class="${hl.has(part)?'h':'p'}" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke-width="${w}" stroke-linecap="round"/>`};
+ return `<svg class="exi" viewBox="0 0 48 48" width="${sz}" height="${sz}" aria-hidden="true">${(p.e||[]).map(([a,b,c,d])=>`<line class="e" x1="${a}" y1="${b}" x2="${c}" y2="${d}" stroke-width="1.6" stroke-linecap="round"/>`).join('')}${p.s.map(seg).join('')}<circle class="hd" cx="${p.hd[0]}" cy="${p.hd[1]}" r="3.6"/></svg>`}
+const EXPOSE={'Wyciąg górny':'pulldown','Wyciskanie w siadzie':'chest','Wiosłowanie w siadzie':'row','Wyciskanie nad głowę':'ohp','Leg press':'legpress','Hiszpański przysiad':'squat','Izometria prostowania nóg':'legext','Powolne powtórzenia':'squat','Spięcie brzucha McGilla':'curlup','Deska bokiem':'sideplank','Pies z ptakiem':'birddog','Pallof press':'pallof'};
+function planIcons(t){t=(t||'').toLowerCase();const k=[];
+ if(/body by science|trening/.test(t))k.push('pulldown','chest');
+ if(/kręgosłup/.test(t))k.push('curlup','sideplank');
+ if(/kolan|przysiad/.test(t))k.push('squat');
+ if(/spacer|marsz/.test(t))k.push('walk');
+ return k.slice(0,3).map(x=>poseSvg(x,36)).join('')}
+
+/* ---------- Ekran: Plan dnia ---------- */
+function vPlan(){const now=new Date().toISOString(),TM=recTimed().filter(x=>x.iso>=new Date(Date.now()-6*36e5).toISOString()),days=[...new Set(TM.map(x=>x.day))].slice(0,5);
+ if(!days.length)return '<section class="card"><p style="margin:0">Plan dnia pojawi się po najbliższej aktualizacji zaleceń.</p></section>';
+ return days.map((dd,i)=>`<details class="card"${i===0?' open':''}><summary><span>${dayName(dd)}</span></summary>${TM.filter(x=>x.day===dd).map(x=>`<div class="pl${x.iso<now?' past':''}"><span class="t">${ht(x.iso,x.tz)}</span><div class="x"><b>${esc(x.tytul)}</b>${x.ap?` <span class="hint" style="margin:0">${x.ap}</span>`:''}${x.tekst?`<br><span>${esc(x.tekst)}</span>`:''}</div>${planIcons(x.tytul+' '+x.tekst)}</div>`).join('')}</details>`).join('')+'<p class="hint">Godziny: L – lokalny, C – Warszawa, Z – UTC. Te same punkty są w kalendarzu „dziennik”.</p>'}
+
+/* ---------- Ekran: Przed i po ---------- */
+const IDB=(()=>{let p;const db=()=>p||(p=new Promise((ok,no)=>{const q=indexedDB.open('dz',1);q.onupgradeneeded=()=>q.result.createObjectStore('img');q.onsuccess=()=>ok(q.result);q.onerror=()=>no(q.error)}));
+ return{get:k=>db().then(d=>new Promise(ok=>{const q=d.transaction('img').objectStore('img').get(k);q.onsuccess=()=>ok(q.result||null);q.onerror=()=>ok(null)})).catch(()=>null),
+ set:(k,v)=>db().then(d=>new Promise(ok=>{const t=d.transaction('img','readwrite');t.objectStore('img').put(v,k);t.oncomplete=()=>ok(true);t.onerror=()=>ok(false)})).catch(()=>false)}})();
+let BP={przod:null,profil:null},bpSlot='przod';
+const BPV={przod:'Przód',profil:'Profil'};
+function bpSessions(){const g={};list().filter(e=>e.typ==='sylwetka').forEach(e=>{(g[e.sesja||dayOf(e)]=g[e.sesja||dayOf(e)]||{})[e.widok||(e.co||[])[0]||'przod']=e});return Object.entries(g).sort((a,b)=>b[0].localeCompare(a[0]))}
+function bpOverlay(e){if(!e||(!e.obrys&&!e.linie))return'';const pts=(e.obrys||[]).map(p=>p.join(',')).join(' ');
+ return `<svg viewBox="0 0 100 100" preserveAspectRatio="none">${pts?`<polygon points="${pts}" fill="none" stroke="#ffd23f" stroke-width="2" vector-effect="non-scaling-stroke" stroke-linejoin="round"/>`:''}${(e.linie||[]).map(l=>`<line x1="${l[0]}" y1="${l[1]}" x2="${l[2]}" y2="${l[3]}" stroke="${l[4]||'#3fd0ff'}" stroke-width="1.5" stroke-dasharray="${l[5]?'4 3':''}" vector-effect="non-scaling-stroke"/>`).join('')}</svg>`}
+function bpImg(e,label){if(!e)return `<div class="bpimg"><small>${label}</small></div>`;return `<div class="bpimg" data-ov="1"><img data-idb="${e.id}" alt="${label}">${bpOverlay(e)}<small>${label}</small></div>`}
+function vSylwetka(){const ss=bpSessions(),last=ss[0],lastT=last?Math.min(...Object.values(last[1]).map(e=>+new Date(e.utc))):0;
+ const days=last?(Date.now()-lastT)/864e5:999,canNew=days>=30,canFix=last&&days<2,next=last?new Date(lastT+30*864e5):null;
+ const slot=w=>`<div><div class="bpimg">${BP[w]?`<img src="${BP[w].disp}" alt="">`:''}<small>${BPV[w]}</small></div><div class="row" style="margin-top:6px;flex-wrap:nowrap"><button data-bpc="${w}" style="flex:1;padding:0 6px">Aparat</button><button data-bpg="${w}" style="flex:1;padding:0 6px">Galeria</button></div></div>`;
+ const fixOnly=canFix&&!canNew;const form=canNew||canFix?`<${fixOnly?'details':'section'} class="card"${fixOnly&&(BP.przod||BP.profil)?' open':''}>${fixOnly?'<summary><span>Popraw zdjęcia z ostatniej sesji</span></summary><div style="margin-top:10px">':`<h2>${last?'Nowa sesja zdjęć':'Pierwsze zdjęcia – punkt startowy'}</h2>`}<div class="bp">${slot('przod')}${slot('profil')}</div><div class="row" style="margin-top:12px"><button class="pri" data-bpsave="1"${BP.przod&&BP.profil?'':' disabled'}>Zapisz oba zdjęcia</button></div><p class="hint">Po synchronizacji ocenię postawę, zaznaczę obrys sylwetki i dopiszę krótki opis.</p>${fixOnly?'</div></details>':'</section>'}`
+  :`<section class="card"><h2>Następne zdjęcia</h2><p style="margin:0">Od <b>${next.toLocaleDateString('pl-PL',{day:'numeric',month:'long'})}</b> (za ${Math.ceil(30-days)} dni). Zdjęcia robimy raz w miesiącu – wtedy zmiany są widoczne.</p></section>`;
+ const guide=`<details class="card"${ss.length?'':' open'}><summary><span>Jak zrobić zdjęcie, żeby dało się porównać</span></summary><ol style="margin:8px 0 0;padding-left:20px">
+<li>Rano, po toalecie, <b>przed jedzeniem i piciem</b>, zawsze o tej samej porze.</li>
+<li>Obcisłe krótkie spodenki lub bielizna, bez koszulki, boso.</li>
+<li>To samo miejsce i jasne, gładkie tło; zaznacz taśmą miejsce na stopy.</li>
+<li>Światło z przodu (okno lub lampa za aparatem), bez lampy błyskowej i światła z boku.</li>
+<li>Telefon pionowo, na wysokości pępka, 2–3 m od Ciebie – na półce, statywie albo trzyma go druga osoba. Samowyzwalacz 10 s.</li>
+<li>Cała sylwetka od stóp do głowy, z małym marginesem.</li>
+<li>Stój swobodnie: stopy na szerokość bioder, ręce luźno wzdłuż ciała, wzrok przed siebie. <b>Nie wciągaj brzucha</b> i nie napinaj mięśni.</li>
+<li>Profil: prawy bok do aparatu, ręce lekko do przodu, żeby nie zasłaniały talii i pleców.</li>
+<li>Tego samego dnia zapisz wagę i obwód pasa – zdjęcie plus liczby dają pełny obraz.</li></ol></details>`;
+ const hist=ss.map(([d,v])=>{const o=(v.przod&&v.przod.ocena)||(v.profil&&v.profil.ocena);return `<section class="card"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${dayName(d)}</h2>${(v.przod&&v.przod.obrys)||(v.profil&&v.profil.obrys)?'<button data-bpov="1">Obrys</button>':''}</div><div class="bp" style="margin-top:8px">${bpImg(v.przod,'Przód')}${bpImg(v.profil,'Profil')}</div><p style="margin:10px 0 0">${o?esc(o):'<span class="hint">Ocena postawy pojawi się po najbliższej aktualizacji zaleceń.</span>'}</p></section>`}).join('');
+ return form+guide+hist}
+async function bpFill(){for(const im of document.querySelectorAll('img[data-idb]')){const v=await IDB.get(im.dataset.idb);if(v)im.src=v;else{const e=E[im.dataset.idb];im.replaceWith(Object.assign(document.createElement('p'),{className:'hint',style:'margin:8px',innerHTML:'Zdjęcie jest w arkuszu i na Dysku'+(e&&e.foto?` – <a href="${e.foto}" target="_blank" rel="noopener">otwórz</a>`:'')+'.'}))}}}
+async function bpSave(){const ss=bpSessions(),last=ss[0],days=last?(Date.now()-Math.min(...Object.values(last[1]).map(e=>+new Date(e.utc))))/864e5:999;
+ const sesja=days<2&&last?last[0]:localStr(new Date(),devTz()).slice(0,10);
+ for(const w of ['przod','profil']){const b=BP[w];if(!b)continue;const id='syl-'+sesja+'-'+w;const old=E[id];const e=Object.assign(mk('sylwetka',{co:[w],opis:BPV[w]}),{id,sesja,widok:w});if(old){e.utc=old.utc;e.local=old.local;e.tz=old.tz;e.offset_min=old.offset_min}
+  E[id]=e;await IDB.set(id,b.disp);push({op:'upsert',entry:Object.assign({},e,{foto_data:b.full})})}
+ BP={przod:null,profil:null};toast('Zdjęcia zapisane'+(navigator.onLine?'':' · wyślę po połączeniu'));render()}
+async function bpPick(f){if(!f)return;try{const full=await shrink(f,1600,.85),disp=await shrink(f,1000,.8);BP[bpSlot]={full,disp};render()}catch(x){toast('Nie udało się wczytać zdjęcia')}}
+
 function vZal(){const R=RR();const d=todayLocal();const dz=R.filter(r=>r.data===d),og=R.filter(r=>!r.data||r.data==='ogólne'),nx=R.filter(r=>/^\d{4}-\d\d-\d\d$/.test(r.data)&&r.data>d).sort((a,b)=>a.data.localeCompare(b.data)).slice(0,10);
  const now=new Date().toISOString(),TM=recTimed().filter(x=>x.iso>=new Date(Date.now()-3*36e5).toISOString()),tdays=[...new Set(TM.map(x=>x.day))].slice(0,4);
  const grp=[...new Set(EX.map(x=>x[0]))];
- return `${dz.length?dz.map(r=>`<section class="card rec"><h2>Dziś: ${esc(r.tytul)}</h2><p style="margin:0">${esc(r.tekst)}</p></section>`).join(''):''}
- ${tdays.length?`<section class="card"><h2>Plan z godzinami</h2>${tdays.map(dd=>`<p class="hint" style="margin:10px 0 4px"><b>${dayName(dd)}</b></p>`+TM.filter(x=>x.day===dd).map(x=>`<p style="margin:4px 0;${x.iso<now?'opacity:.5':''}"><b>${ht(x.iso,x.tz)}${x.ap?' '+x.ap:''}</b> · <b>${esc(x.tytul)}</b>${x.tekst?' – '+esc(x.tekst):''}</p>`).join('')).join('')}</section>`:''}
- ${og.map(r=>`<section class="card"><h2>${esc(r.tytul)}</h2><p style="margin:0">${esc(r.tekst)}</p></section>`).join('')}
- ${nx.length?`<section class="card"><h2>Kolejne dni</h2>${nx.map(r=>`<p style="margin:6px 0"><b>${dayName(r.data)}:</b> ${esc(r.tekst)}</p>`).join('')}</section>`:''}
+ return `${dz.length?dz.map(r=>`<details class="card rec" open><summary><span>Dziś: ${esc(r.tytul)}</span></summary><p style="margin:8px 0 0">${esc(r.tekst)}</p></details>`).join(''):''}
+ ${tdays.length?`<p class="hint" style="margin:0 0 12px">Godziny posiłków, snu, ćwiczeń i suplementów są w zakładce <a href="#plan">Plan dnia</a>.</p>`:''}
+ ${og.map(r=>`<details class="card"><summary><span>${esc(r.tytul)}</span></summary><p style="margin:8px 0 0">${esc(r.tekst)}</p></details>`).join('')}
+ ${nx.length?`<details class="card"><summary><span>Kolejne dni</span></summary>${nx.map(r=>`<p style="margin:6px 0"><b>${dayName(r.data)}:</b> ${esc(r.tekst)}</p>`).join('')}</details>`:''}
  ${!R.length?'<section class="card"><p style="margin:0">Zalecenia pojawią się po pierwszej synchronizacji z arkuszem.</p></section>':''}
- <section class="card"><h2>Ćwiczenia</h2>${grp.map(g=>`<p class="hint" style="margin:12px 0 0"><b>${g}</b></p>${EX.filter(x=>x[0]===g).map(x=>`<details><summary>${x[1]}</summary><p style="margin:6px 0">${x[2]}</p><a href="${x[3]}" target="_blank" rel="noopener">Film (wymaga internetu)</a></details>`).join('')}`).join('')}</section>`}
+ <details class="card"><summary><span>Ćwiczenia</span></summary>${grp.map(g=>`<p class="hint" style="margin:12px 0 0"><b>${g}</b></p>${EX.filter(x=>x[0]===g).map(x=>`<details class="ex"><summary><span>${x[1]}</span>${poseSvg(EXPOSE[x[1]])}</summary><p style="margin:6px 0">${x[2]}</p><a href="${x[3]}" target="_blank" rel="noopener">Film (wymaga internetu)</a></details>`).join('')}`).join('')}</details>`}
 
 /* ---------- Ekran: Postęp ---------- */
 let pex='';
@@ -473,20 +546,23 @@ function vUst(){return `<section class="card"><h2>Połączenie z arkuszem</h2><l
  <section class="card"><h2>Strefa domowa i cele</h2><label for="s_home">Strefa domowa</label><input id="s_home" type="text" value="${esc(S.home)}"><p class="hint">Telefon jest teraz w strefie ${esc(devTz())} (${esc(short(devTz()))}). Każdy wpis zapisuje swoją strefę, więc godziny z postojów się nie mieszają.</p><label for="s_kc">Cel kalorii (kcal)</label><input id="s_kc" type="number" value="${esc(S.kcal||2300)}"><label for="s_cel">Cel wody (ml)</label><input id="s_cel" type="number" value="${esc(S.cel)}"><label for="s_vc">Witamina C w wodzie – mg na każde 250 ml</label><input id="s_vc" type="number" value="${esc(S.vitc)}"><p class="hint">Mieszanka askorbinianu sodu z kwasem askorbinowym. Gdy na ekranie Dodaj zaznaczysz „z witaminą C”, dawka liczy się proporcjonalnie, np. 500 ml wody = 2 × ta dawka.</p></section>
 ${(()=>{const ri=recInfo();return `<section class="card" id="sec-zal"><h2>Zalecenia</h2><p style="margin:0">${ri?'Ostatnia aktualizacja: <b>'+fmtDT(ri.tytul)+'</b>':'Jeszcze bez zaleceń.'}</p>${ri&&ri.tekst?`<p style="margin:8px 0 0">${esc(ri.tekst)}</p>`:''}<p class="hint">Claude aktualizuje je automatycznie 2 razy dziennie, ok. 7:40C i 18:40C, na podstawie wpisów i grafiku. Pobierają się przy synchronizacji.</p><a class="btnlink" href="https://claude.ai/new?q=${encodeURIComponent(REQ+' Profil: '+PROF[S.prof]+'. Moje dane są we wpisie typu profil.')}" target="_blank" rel="noopener">Poproś o zalecenia teraz</a><p class="hint">Otwiera Claude z gotową prośbą – wystarczy ją wysłać. Najpierw dodaj zaległe wpisy i poczekaj na synchronizację.</p></section>`})()}
  ${FLY()?'':'<!--'}<section class="card"><h2>Grafik lotów</h2><p class="hint" style="margin:0 0 10px">Wgraj PDF „Individual plan” z CrewLink. Godziny z grafiku (UTC) zamienię na lokalne. Ponowne wgranie tego samego miesiąca (np. v2) zastępuje poprzednią wersję.</p><button class="pri" data-pdf="1">Wgraj grafik (PDF)</button><p class="hint" id="pdfmsg">${esc(pdfMsg)}</p><h2 style="margin-top:14px">Wgrane grafiki (pamiętam 2 ostatnie)</h2>${rostersHtml()}</section>${FLY()?'':'-->'}
- <section class="card"><h2>Jak korzystać</h2><details><summary>Bez internetu</summary><p style="margin:6px 0">Aplikacja działa w pełni offline: wpisy zapisują się w telefonie i czekają w kolejce („Do wysłania: N”), a wysyłają się same, gdy wróci zasięg. Stronę można odświeżać offline – wczyta się z pamięci telefonu. Nie trzeba tego robić dla odliczań: nagłówek przelicza się co 30 s i od razu po powrocie do aplikacji. Offline nie dojdą tylko nowe zalecenia i nowa wersja aplikacji.</p></details><details><summary>Dodawanie wpisów</summary><p style="margin:6px 0">Przyciski wody (+250, +330, +500 ml) zapisują wpis od razu; „Usuń … ml” kasuje ostatnią porcję wody. Kafelek (posiłek, kawa, sen, trening…) i „Inna ilość” otwierają okienko z ilością, opisem, kcal i zdjęciem. Godzina wpisuje się sama (zaokrąglona do 5 min, w strefie telefonu); zmienisz ją tarczą zegara. Każdy wpis poprawisz lub usuniesz w Historii.</p></details><details><summary>Oznaczenia czasu</summary><p style="margin:6px 0">Każda godzina ma literę: L – czas lokalny miejsca, w którym jesteś (lub lotniska podanego obok), C – czas warszawski (CET/CEST), Z – UTC. Lotniska są kodami IATA; tylko lokalizacja w nagłówku ma pełną nazwę miasta i kod ICAO.</p></details><details><summary>Nagłówek</summary><p style="margin:6px 0">Na górze: godzina lokalna, UTC i warszawska, pod nią WOCL (02:00–05:59 w strefie, do której jesteś zaaklimatyzowany) i stan aklimatyzacji wg EASA ORO.FTL.105 (B – WAW, D – lokalnie, X – nieokreślony). Niżej lokalizacja i następne wydarzenie: lot (meldowanie i wylot) albo zalecenie z godziną, z odliczaniem.</p></details><details><summary>Profil i „O mnie”</summary><p style="margin:6px 0">Wypełnij kartę „O mnie” (wiek, cele, zdrowie, tryb dnia, jedzenie) i naciśnij „Zapisz profil” – trafi do arkusza i na tej podstawie układam zalecenia. W karcie Profil wybierz, czy latasz (short haul / long haul), czy nie. Dla osób, które nie latają, znikają Grafik, WOCL i aklimatyzacja – reszta działa tak samo.</p></details><details><summary>Grafik</summary><p style="margin:6px 0">Wgraj PDF „Individual plan” z CrewLink przyciskiem „Wgraj grafik (PDF)” w Ustawieniach; loty i służby zobaczysz w zakładce Grafik. Aplikacja pamięta dwa miesiące; nowy grafik pojawia się 17. dnia miesiąca – wtedy przypomni o wgraniu. Meldowanie bierze z C/I w grafiku. Grafik trafia też do arkusza, więc zalecenia są do niego dopasowane.</p></details><details><summary>Zalecenia</summary><p style="margin:6px 0">Aktualizuję je automatycznie dwa razy dziennie, ok. 07:40C i 18:40C, na podstawie wpisów i grafiku. Czas ostatniej aktualizacji i notatka są w sekcji Zalecenia wyżej. Zalecenia z godziną (sen, drzemka, posiłek, trening, kofeina) są w zakładce Zalecenia, w następnym wydarzeniu i w kalendarzu Google „dziennik” (na 3 dni naprzód). Link „Poproś o zalecenia teraz” otwiera rozmowę ze mną.</p></details><details><summary>Kalorie</summary><p style="margin:6px 0">Kawa, napoje i alkohol liczą się same z ml i rodzaju. Posiłki bez kcal szacuję przy aktualizacji – ze zdjęcia albo opisu. Swoją wartość możesz wpisać w polu kcal; wtedy jej nie nadpisuję. Zdjęcia wysyłają się tylko z internetem.</p></details><details><summary>Witamina C</summary><p style="margin:6px 0">Dawka w ustawieniu wyżej jest na każde 250 ml wody. Gdy na ekranie Dodaj włączysz „z witaminą C”, każda porcja wody zapisze się z dawką proporcjonalną do ilości.</p></details><details><summary>Nowa wersja</summary><p style="margin:6px 0">Gdy wprowadzę zmiany, zamknij aplikację i otwórz ją z internetem. Numer wersji widzisz poniżej.</p></details></section>
- <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wersja aplikacji: 18 (19.11.2026) · Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
+ <section class="card"><h2>Jak korzystać</h2><details><summary>Bez internetu</summary><p style="margin:6px 0">Aplikacja działa w pełni offline: wpisy zapisują się w telefonie i czekają w kolejce („Do wysłania: N”), a wysyłają się same, gdy wróci zasięg. Stronę można odświeżać offline – wczyta się z pamięci telefonu. Nie trzeba tego robić dla odliczań: nagłówek przelicza się co 30 s i od razu po powrocie do aplikacji. Offline nie dojdą tylko nowe zalecenia i nowa wersja aplikacji.</p></details><details><summary>Dodawanie wpisów</summary><p style="margin:6px 0">Przyciski wody (+250, +330, +500 ml) zapisują wpis od razu; „Usuń … ml” kasuje ostatnią porcję wody. Kafelek (posiłek, kawa, sen, trening…) i „Inna ilość” otwierają okienko z ilością, opisem, kcal i zdjęciem. Godzina wpisuje się sama (zaokrąglona do 5 min, w strefie telefonu); zmienisz ją tarczą zegara. Każdy wpis poprawisz lub usuniesz w Historii.</p></details><details><summary>Oznaczenia czasu</summary><p style="margin:6px 0">Każda godzina ma literę: L – czas lokalny miejsca, w którym jesteś (lub lotniska podanego obok), C – czas warszawski (CET/CEST), Z – UTC. Lotniska są kodami IATA; tylko lokalizacja w nagłówku ma pełną nazwę miasta i kod ICAO.</p></details><details><summary>Nagłówek</summary><p style="margin:6px 0">Na górze: godzina lokalna, UTC i warszawska, pod nią WOCL (02:00–05:59 w strefie, do której jesteś zaaklimatyzowany) i stan aklimatyzacji wg EASA ORO.FTL.105 (B – WAW, D – lokalnie, X – nieokreślony). Niżej lokalizacja i następne wydarzenie: lot (meldowanie i wylot) albo zalecenie z godziną, z odliczaniem.</p></details><details><summary>Profil i „O mnie”</summary><p style="margin:6px 0">Wypełnij kartę „O mnie” (wiek, cele, zdrowie, tryb dnia, jedzenie) i naciśnij „Zapisz profil” – trafi do arkusza i na tej podstawie układam zalecenia. W karcie Profil wybierz, czy latasz (short haul / long haul), czy nie. Dla osób, które nie latają, znikają Grafik, WOCL i aklimatyzacja – reszta działa tak samo.</p></details><details><summary>Grafik</summary><p style="margin:6px 0">Wgraj PDF „Individual plan” z CrewLink przyciskiem „Wgraj grafik (PDF)” w Ustawieniach; loty i służby zobaczysz w zakładce Grafik. Aplikacja pamięta dwa miesiące; nowy grafik pojawia się 17. dnia miesiąca – wtedy przypomni o wgraniu. Meldowanie bierze z C/I w grafiku. Grafik trafia też do arkusza, więc zalecenia są do niego dopasowane.</p></details><details><summary>Zalecenia</summary><p style="margin:6px 0">Aktualizuję je automatycznie dwa razy dziennie, ok. 07:40C i 18:40C, na podstawie wpisów i grafiku. Czas ostatniej aktualizacji i notatka są w sekcji Zalecenia wyżej. Zalecenia z godziną (sen, drzemka, posiłek, trening, kofeina) są w zakładce Zalecenia, w następnym wydarzeniu i w kalendarzu Google „dziennik” (na 3 dni naprzód). Link „Poproś o zalecenia teraz” otwiera rozmowę ze mną.</p></details><details><summary>Plan dnia i Przed i po</summary><p style="margin:6px 0">Plan dnia to harmonogram z godzinami: sen, posiłki, suplementy, ćwiczenia (z ikoną ćwiczenia). „Przed i po” – raz w miesiącu zdjęcie z przodu i z profilu według instrukcji; po synchronizacji oceniam postawę, rysuję obrys i dopisuję opis. Zdjęcia w dobrej jakości są w telefonie, pełne – na Twoim Dysku. Poprawić zdjęcia można do 2 dni po sesji.</p></details><details><summary>Kalorie</summary><p style="margin:6px 0">Kawa, napoje i alkohol liczą się same z ml i rodzaju. Posiłki bez kcal szacuję przy aktualizacji – ze zdjęcia albo opisu. Swoją wartość możesz wpisać w polu kcal; wtedy jej nie nadpisuję. Zdjęcia wysyłają się tylko z internetem.</p></details><details><summary>Witamina C</summary><p style="margin:6px 0">Dawka w ustawieniu wyżej jest na każde 250 ml wody. Gdy na ekranie Dodaj włączysz „z witaminą C”, każda porcja wody zapisze się z dawką proporcjonalną do ilości.</p></details><details><summary>Nowa wersja</summary><p style="margin:6px 0">Gdy wprowadzę zmiany, zamknij aplikację i otwórz ją z internetem. Numer wersji widzisz poniżej.</p></details></section>
+ <section class="card"><h2>Dane w telefonie</h2><p class="hint" style="margin:0">Wersja aplikacji: 19 (20.11.2026) · Wpisów: ${Object.keys(E).length} · do wysłania: ${Q.length}</p></section>`}
 
 /* ---------- Render i zdarzenia ---------- */
-const TT={dodaj:'Dodaj',historia:'Historia',grafik:'Grafik',zalecenia:'Zalecenia',postep:'Postęp',ustawienia:'Ustawienia'};
+const TT={dodaj:'Dodaj',plan:'Plan dnia',historia:'Historia',grafik:'Grafik',zalecenia:'Zalecenia',postep:'Postęp',sylwetka:'Przed i po',ustawienia:'Ustawienia'};
 const route=()=>{const h=location.hash.slice(1);return TT[h]&&!(h==='grafik'&&!FLY())?h:'dodaj'};
 function clock(){if(route()==='dodaj'&&!document.querySelector('.sheet.open'))$('#ttl').innerHTML=headLoc();const tz=devTz(),n=new Date();$('#now').innerHTML=`<b>${localStr(n,tz).slice(11)}${sfx(tz)}</b>${sfx(tz)!=='Z'?` · ${localStr(n,'UTC').slice(11)}Z`:''}<br>${n.toLocaleDateString('pl-PL',{weekday:'short',day:'numeric',month:'short',timeZone:tz})}${tz!==S.home?` · WAW ${localStr(n,S.home).slice(11)}C`:''}${route()==='dodaj'&&FLY()?woclNow():''}`}
 function render(){const r=route();document.querySelector('header').classList.toggle('home',r==='dodaj');if(r==='dodaj')$('#ttl').innerHTML=headLoc();else $('#ttl').textContent=TT[r];document.querySelectorAll('#nav a').forEach(a=>{a.classList.toggle('on',a.dataset.r===r);a.hidden=a.dataset.r==='grafik'&&!FLY()});
- $('#view').innerHTML={grafik:vGrafikTab,dodaj:vDodaj,historia:vHistoria,zalecenia:vZal,postep:vPostep,ustawienia:vUst}[r]();clock();status()}
+ $('#view').innerHTML={plan:vPlan,sylwetka:vSylwetka,grafik:vGrafikTab,dodaj:vDodaj,historia:vHistoria,zalecenia:vZal,postep:vPostep,ustawienia:vUst}[r]();clock();status();if(r==='sylwetka')bpFill();const na=document.querySelector('#nav a.on');if(na&&na.scrollIntoView)na.scrollIntoView({block:'nearest',inline:'center'})}
 addEventListener('hashchange',()=>{render();scrollTo(0,0)});
 $('#ttl').addEventListener('click',e=>{const a=e.target.closest('[data-go]');if(!a)return;e.preventDefault();location.hash='ustawienia';setTimeout(()=>{const el=document.getElementById(a.dataset.go);if(el)el.scrollIntoView({behavior:'smooth'})},80)});
 $('#view').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;const d=b.dataset;
  if(d.w)add('woda',{ilosc:+d.w,vitc_mg:S.vcOn?Math.round(S.vitc*d.w/250):null,co:S.vcOn?['Witamina C']:[]});
  else if(d.vct){S.vcOn=!S.vcOn;ls.set('settings',S);render()}
+ else if(d.bpc||d.bpg){bpSlot=d.bpc||d.bpg;picking=true;$(d.bpc?'#bpCam':'#bpGal').click()}
+ else if(d.bpsave){bpSave()}
+ else if(d.bpov){b.closest('.card').querySelectorAll('.bpimg').forEach(x=>x.classList.toggle('noov'))}
  else if(d.undo){const x=E[d.undo];delete E[d.undo];push({op:'delete',id:x.id});toast('Cofnięto');render()}
  else if(d.open)openSheet(d.open);
  else if(d.edit)openSheet(null,E[d.edit]);
@@ -521,6 +597,7 @@ let pdfMsg='',picking=false;
 $('#pdfIn').addEventListener('change',async e=>{picking=false;const f=e.target.files[0];if(!f)return;pdfMsg='Czytam grafik '+f.name+'…';render();
  try{const t=await importRoster(f);pdfMsg='Wgrano: '+t;toast('Grafik wgrany')}catch(x){pdfMsg='Nie udało się: '+(x.message||x);toast('Błąd grafiku')}e.target.value='';render()});
 $('#pdfIn').addEventListener('click',()=>{picking=true});
+['#bpCam','#bpGal'].forEach(id=>$(id).addEventListener('change',async e=>{picking=false;await bpPick(e.target.files[0]);e.target.value=''}));
 DARK.addEventListener&&DARK.addEventListener('change',render);
 $('#dialov').addEventListener('click',e=>{if(e.target.id==='dialov'){$('#dialov').classList.remove('open');return}const g=e.target.closest('[data-v]');if(g){const v=+g.dataset.v;if(DL.mode==='h'){DL.h=v;DL.mode='m'}else DL.m=v;drawDial();return}
  const b=e.target.closest('button');if(!b)return;const d=b.dataset;
